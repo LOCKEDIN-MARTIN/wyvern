@@ -9,11 +9,10 @@ readme = "README.md"
 requires-python = ">=3.9"
 dynamic = ["version"]
 dependencies = [
-    "numpy",
-    "scipy",
-    "matplotlib",
-    "pandas",
-    "openpyxl"
+    "numpy",        # essential math library
+    "matplotlib",   # plotting
+    "pandas",       # data processing and formatting
+    "openpyxl"      # for reading excel files using pandas
 ]
 
 [project.urls]

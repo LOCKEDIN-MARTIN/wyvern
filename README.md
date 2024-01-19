@@ -1,4 +1,4 @@
-# Wyvern
+![image](static/wyvern_logo.png)
 Analysis library for Night Fury design in AER406 2024S.
 
 ## Setup
@@ -32,7 +32,7 @@ The library is designed to be used as a module. The main entry point is the `wyv
 ### Example: Aerostructual Mass Ratio
 For example, we want to use Rassam's mass correlation technique to estimate the aerostructural mass ratio $W_{\text{aerostructure}} / W_0$ of *Night Fury* for use in sizing.
 
-We assume that $ W_{\text{propulsion}} + W_{\text{avionics}} = 400 g$.
+We assume that $W_{\text{propulsion}} + W_{\text{avionics}} = 400 g$.
 
 ```python
 from wyvern.sizing import aerostructural_mass_ratio
@@ -43,3 +43,5 @@ fixed_mass = 400 # g
 mass_ratio = aerostructural_mass_ratio(BWB_HISTORICAL, fixed_mass)
 ```
 
+### More Examples
+See the `examples` folder for more notebooks.
