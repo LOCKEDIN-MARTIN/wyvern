@@ -1,0 +1,17 @@
+{
+    "Ping Pong Ball": {
+        "mass": 2.7,
+        "points": 10,
+        "diameter": 40
+    },
+    "Golf Ball": {
+        "mass": 45.93,
+        "points": 50,
+        "diameter": 42.67
+    },
+    "Tennis Ball": {
+        "mass": 59.4,
+        "points": 100,
+        "diameter": 68.6
+    }
+}

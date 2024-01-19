@@ -1,0 +1,74 @@
+{
+    "Motor": {
+        "category": "Propulsion",
+        "basic_mass": 82,
+        "mga_pct": 2.5,
+        "qty": 1
+    },
+    "Propeller": {
+        "category": "Propulsion",
+        "basic_mass": 10,
+        "mga_pct": 5,
+        "qty": 1
+    },
+    "ESC": {
+        "category": "Propulsion",
+        "basic_mass": 37,
+        "mga_pct": 2.5,
+        "qty": 1
+    },
+    "RPM Sensor": {
+        "category": "Propulsion",
+        "basic_mass": 10,
+        "mga_pct": 10,
+        "qty": 1
+    },
+    "Battery": {
+        "category": "Avionics",
+        "basic_mass": 102,
+        "mga_pct": 5,
+        "qty": 1
+    },
+    "GPS": {
+        "category": "Avionics",
+        "basic_mass": 33,
+        "mga_pct": 5,
+        "qty": 1
+    },
+    "Pixhawk": {
+        "category": "Avionics",
+        "basic_mass": 37,
+        "mga_pct": 2.5,
+        "qty": 1
+    },
+    "Receiver": {
+        "category": "Avionics",
+        "basic_mass": 5,
+        "mga_pct": 10,
+        "qty": 1
+    },
+    "Servo": {
+        "category": "Avionics",
+        "basic_mass": 12,
+        "mga_pct": 5,
+        "qty": 4
+    },
+    "Air Data System": {
+        "category": "Avionics",
+        "basic_mass": 17,
+        "mga_pct": 10,
+        "qty": 1
+    },
+    "Telemetry Radio": {
+        "category": "Avionics",
+        "basic_mass": 24,
+        "mga_pct": 5,
+        "qty": 1
+    },
+    "Power Module": {
+        "category": "Avionics",
+        "basic_mass": 24,
+        "mga_pct": 5,
+        "qty": 1
+    }
+}
