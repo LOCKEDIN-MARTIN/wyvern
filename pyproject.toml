@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=66.0.0", "wheel", "setuptools_scm[toml]>=6.0.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wyvern"
+description = "Analysis library for Night Fury design in AER406 2024S."
+readme = "README.md"
+requires-python = ">=3.9"
+dynamic = ["version"]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pandas",
+    "openpyxl"
+]
+
+[project.urls]
+homepage = "https://github.com/AER406-SR72/wyvern"
+
+[tool.setuptools_scm]
+write_to = "wyvern/_version.py"
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+notebook = ["jupyter"]
+
+[tool.setuptools]
+packages = ["wyvern"]
