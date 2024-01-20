@@ -1,4 +1,4 @@
-from wyvern.data import RASSAM_CORRELATIONS, ALL_HISTORICAL
+from wyvern.data import ALL_HISTORICAL, RASSAM_CORRELATIONS
 
 # calculate average of S_wet / S_ref
 
