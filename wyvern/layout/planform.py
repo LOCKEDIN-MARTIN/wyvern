@@ -343,21 +343,18 @@ def viz_planform(configuration: PlanformParameters):
         # no legend for this one
         color="C1",
     )
-    plt.scatter(centroid[0], centroid[1], label="overall centroid")
+    plt.axhline(centroid, color="k", linestyle="--", label=f"X_c = {centroid:.2f} mm")
     plt.axhline(
-        centroid[1], color="k", linestyle="--", label=f"X_c = {centroid[1]:.2f} mm"
-    )
-    plt.axhline(
-        cb_centroid[1],
+        cb_centroid,
         color="C3",
         linestyle="--",
-        label=f"X_c, CB = {cb_centroid[1]:.2f} mm",
+        label=f"X_c, CB = {cb_centroid:.2f} mm",
     )
     plt.axhline(
-        wing_centroid[1],
+        wing_centroid,
         color="C2",
         linestyle="--",
-        label=f"X_c, W = {wing_centroid[1]:.2f} mm",
+        label=f"X_c, W = {wing_centroid:.2f} mm",
     )
 
     # styling
@@ -365,7 +362,7 @@ def viz_planform(configuration: PlanformParameters):
     plt.axis("equal")
     plt.grid()
     plt.title(
-        f"{configuration.name}\nArea: {2*wing_area/1e6:.2f} (W) + {2*cb_area/1e6:.2f} (CB) = {area/1e6:.2f} $m^2$"
+        f"{configuration.name}\nArea: {2*wing_area/1e6:.3f} (W) + {2*cb_area/1e6:.3f} (CB) = {area/1e6:.3f} $m^2$"
     )
     plt.xlabel("Y (mm)")
     plt.ylabel("X (mm)")
