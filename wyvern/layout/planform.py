@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from io import StringIO
 
 import numpy as np
@@ -39,6 +39,14 @@ class PlanformParameters:
     ctrl_surface_start_y: float
     ctrl_surface_end_y: float
     ctrl_surface_x_over_c: float  # how far it creeps up the end of the wing
+
+    @property
+    def to_dict(self):
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d)
 
 
 def planform_span_stations(conf: PlanformParameters) -> pd.DataFrame:
@@ -202,14 +210,6 @@ def full_planform_points(df: pd.DataFrame) -> np.ndarray:
 def wing_points(df: pd.DataFrame) -> np.ndarray:
     """
     Gets just the wing coordinates (single-sided).
-
-    The DataFrame must have the following columns:
-
-    - Y
-    - XLE
-    - XTE
-
-    The DataFrame must be sorted by Y ascending.
     """
     # only need to get the wing portion
     wing = df.loc["wing_root":"wing_tip"]
@@ -225,14 +225,6 @@ def wing_points(df: pd.DataFrame) -> np.ndarray:
 def centerbody_points(df: pd.DataFrame) -> np.ndarray:
     """
     Gets just the centerbody coordinates (single-sided).
-
-    The DataFrame must have the following columns:
-
-    - Y
-    - XLE
-    - XTE
-
-    The DataFrame must be sorted by Y ascending.
     """
     # only need to get the wing portion
     centerbody = df.loc["center":"wing_root"]
@@ -243,6 +235,26 @@ def centerbody_points(df: pd.DataFrame) -> np.ndarray:
     pts_te = centerbody[["Y", "XTE"]].values[::-1]
 
     return np.concatenate([pts_le, pts_te])
+
+
+def control_surface_points(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Gets just the control surface coordinates (dual-sided).
+    """
+    ctl_surface_pts = np.array(
+        [
+            [
+                df.loc["ctrl_surface_start", "Y"],
+                df.loc["ctrl_surface_start", "hinge_line"],
+            ],
+            [df.loc["ctrl_surface_end", "Y"], df.loc["ctrl_surface_end", "hinge_line"]],
+        ]
+    )
+    # mirror the control surface points
+    ctl_surface_pts_mirror = ctl_surface_pts.copy()
+    ctl_surface_pts_mirror[:, 0] = -ctl_surface_pts_mirror[:, 0]
+
+    return ctl_surface_pts, ctl_surface_pts_mirror
 
 
 def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
@@ -279,12 +291,20 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
     c_tip = c_root * configuration.wing_taper_ratio
     mac = 2 / 3 * (c_root + c_tip - c_root * c_tip / (c_root + c_tip))
 
+    # areas
+    area = area_of_points(full_pts)
+    cb_area = area_of_points(cb_pts)
+    wing_area = area_of_points(wing_pts)
+
     return pd.DataFrame(
         {
+            "overall_area": area,
             "overall_aspect_ratio": overall_ar,
             "overall_centroid": overall_centroid[1],
+            "wing_half_area": wing_area,
             "wing_aspect_ratio": wing_ar,
             "wing_centroid": wing_centroid[1],
+            "centerbody_half_area": cb_area,
             "centerbody_aspect_ratio": cb_ar,
             "centerbody_centroid": cb_centroid[1],
             "wing_mean_aerodynamic_chord": mac,
@@ -298,32 +318,16 @@ def viz_planform(configuration: PlanformParameters):
     Visualize the planform.
     """
     df = planform_span_stations(configuration)
-
     pts = full_planform_points(df)
-    wing_pts = wing_points(df)
-    cb_pts = centerbody_points(df)
+    ctl_surface_pts, ctl_surface_pts_mirror = control_surface_points(df)
 
-    ctl_surface_pts = np.array(
-        [
-            [
-                df.loc["ctrl_surface_start", "Y"],
-                df.loc["ctrl_surface_start", "hinge_line"],
-            ],
-            [df.loc["ctrl_surface_end", "Y"], df.loc["ctrl_surface_end", "hinge_line"]],
-        ]
-    )
-    # mirror the control surface points
-    ctl_surface_pts_mirror = ctl_surface_pts.copy()
-    ctl_surface_pts_mirror[:, 0] = -ctl_surface_pts_mirror[:, 0]
-
-    centroid = centroid_of_polyshape(pts)
-    area = area_of_points(pts)
-
-    cb_area = area_of_points(cb_pts)
-    wing_area = area_of_points(wing_pts)
-
-    cb_centroid = centroid_of_polyshape(cb_pts)
-    wing_centroid = centroid_of_polyshape(wing_pts)
+    stats = planform_stats(configuration)
+    centroid = stats.loc[configuration.name, "overall_centroid"]
+    cb_centroid = stats.loc[configuration.name, "centerbody_centroid"]
+    wing_centroid = stats.loc[configuration.name, "wing_centroid"]
+    area = stats.loc[configuration.name, "overall_area"]
+    cb_area = stats.loc[configuration.name, "centerbody_half_area"]
+    wing_area = stats.loc[configuration.name, "wing_half_area"]
 
     # plotting
     plt.plot(pts[:, 0], pts[:, 1])
