@@ -1,22 +1,22 @@
+from copy import copy
+from typing import Sequence
+
 import pandas as pd
-from wyvern.sizing import (
-    total_mass,
-    payload_mass,
-    total_component_mass,
-    aerostructural_mass_ratio,
-)
+from matplotlib import pyplot as plt
+
+from wyvern.analysis.parameters import PayloadSizingParameters
 from wyvern.metrics import cargo_units
-from wyvern.data import ALL_COMPONENTS
 from wyvern.metrics.scoring import _flight_score_factors
 from wyvern.performance.energy import energy_consumption
-from wyvern.analysis.parameters import AssumedParameters
+from wyvern.sizing import (
+    payload_mass,
+    total_mass,
+)
 
 
 def sweep_payload_configs(
     payload_configs: list[tuple[int]],
-    params: AssumedParameters,
-    historical_ref: pd.DataFrame,
-    components: pd.DataFrame = ALL_COMPONENTS,
+    params: PayloadSizingParameters,
 ) -> pd.DataFrame:
     """Sweep payload configurations.
 
@@ -26,10 +26,6 @@ def sweep_payload_configs(
         List of payload configurations.
     params : AssumedParameters
         Parameters for the analysis.
-    historical_ref : pd.DataFrame
-        Dataframe of historical reference configurations.
-    components : pd.DataFrame
-        Dataframe of components, by default ALL_COMPONENTS.
 
     Returns
     -------
@@ -38,23 +34,14 @@ def sweep_payload_configs(
     """
     results = {}
 
-    # Compute constants
-    total_fixed_mass = total_component_mass(components)
-    as_mass_ratio = aerostructural_mass_ratio(historical_ref, total_fixed_mass)
-
-    print(
-        f"Total Fixed Mass: {total_fixed_mass:.2f} g\n"
-        f"AS Mass Ratio: {as_mass_ratio*100:.3f}%"
-    )
-
     # Do Sweep
     for config in payload_configs:
         payload_mass_ = payload_mass(config)
-        total_mass_ = total_mass(config, as_mass_ratio, total_fixed_mass)
+        total_mass_ = total_mass(config, params.as_mass_ratio, params.total_fixed_mass)
         empty_mass_ = total_mass_ - payload_mass_
 
         payload_fraction = payload_mass_ / total_mass_
-        as_mass = as_mass_ratio * total_mass_
+        as_mass = params.as_mass_ratio * total_mass_
         cargo_units_ = cargo_units(config)
 
         reached_pf_cap = payload_fraction > 0.25
@@ -76,9 +63,12 @@ def sweep_payload_configs(
             tb_score,
             cb_score,
             stb_score,
-        ) = _flight_score_factors(config, params, historical_ref, components)
+        ) = _flight_score_factors(config, params)
 
         results[config] = {
+            "num_ping_pong_balls": config[0],
+            "num_golf_balls": config[1],
+            "num_tennis_balls": config[2],
             "payload_mass": payload_mass_,
             "empty_mass": empty_mass_,
             "as_mass": as_mass,
@@ -101,3 +91,52 @@ def sweep_payload_configs(
         }
 
     return pd.DataFrame(results).T
+
+
+def sensitivity_plot(
+    payload_configs: list[tuple[int]],
+    params: PayloadSizingParameters,
+    sensitivity: str,
+    sensitivity_range: Sequence[float],
+):
+    """
+    Plots the flight scores for various payload configurations under varying
+    values of a given parameter.
+
+    Parameters
+    ----------
+    payload_configs : list[tuple[int]]
+        List of payload configurations.
+    params : AssumedParameters
+        Parameters for the analysis. (baseline)
+    sensitivity : str
+        Name of the parameter to vary.
+    sensitivity_range : Sequence[float]
+        List of values to vary the parameter over.
+    """
+
+    # make a big dataframe
+    def do_sweep_at_param(param_value):
+        params_ = copy(params)
+        params_.__dict__[sensitivity] = param_value
+        df_ = sweep_payload_configs(payload_configs, params_)
+        df_["sensitivity"] = param_value
+        return df_
+
+    dfs = [do_sweep_at_param(param_value) for param_value in sensitivity_range]
+
+    # plot flight score wrt # golf balls for each param value
+    fig, ax = plt.subplots()
+    for df, sens_value in zip(dfs, sensitivity_range):
+        ax.plot(
+            df["num_golf_balls"],
+            df["total_flight_score"],
+            label=f"{sens_value}",
+            marker="o",
+        )
+    ax.set_xlabel("Number of Golf Balls")
+    ax.set_ylabel("Flight Score")
+    ax.legend()
+    ax.grid()
+    plt.title(f"Flight Score vs. Payload Config\nfor Varying '{sensitivity}'")
+    plt.show()

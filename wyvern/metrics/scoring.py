@@ -1,16 +1,14 @@
-from wyvern.data import PAYLOADS, ALL_COMPONENTS
-import numpy as np
 from warnings import warn
-import pandas as pd
+
+import numpy as np
+
+from wyvern.analysis.parameters import PayloadSizingParameters
+from wyvern.data import PAYLOADS
 from wyvern.performance.energy import energy_consumption
 from wyvern.sizing import (
-    total_mass,
-    aerostructural_mass_ratio,
-    total_component_mass,
     payload_mass,
+    total_mass,
 )
-
-from wyvern.analysis.parameters import AssumedParameters
 
 
 def cargo_units(payload_config: tuple[int]) -> int:
@@ -44,9 +42,7 @@ def cargo_units(payload_config: tuple[int]) -> int:
 
 def _flight_score_factors(
     payload_config: tuple[int],
-    params: AssumedParameters,
-    historical_ref: pd.DataFrame,
-    components: pd.DataFrame = ALL_COMPONENTS,
+    params: PayloadSizingParameters,
 ) -> tuple[float]:
     """
     Objective Function
@@ -58,11 +54,8 @@ def _flight_score_factors(
     gamma = cargo_units(payload_config)
     cargo_score = gamma**0.7
 
-    total_fixed_mass = total_component_mass(components)
-    as_ratio = aerostructural_mass_ratio(historical_ref, total_fixed_mass)
-
     payload_mass_ = payload_mass(payload_config)
-    mass = total_mass(payload_config, as_ratio, total_fixed_mass)
+    mass = total_mass(payload_config, params.as_mass_ratio, params.total_fixed_mass)
 
     energy = (
         energy_consumption(
@@ -86,9 +79,7 @@ def _flight_score_factors(
 
 def flight_score(
     payload_config: tuple[int],
-    params: AssumedParameters,
-    historical_ref: pd.DataFrame,
-    components: pd.DataFrame = ALL_COMPONENTS,
+    params: PayloadSizingParameters,
 ) -> float:
     """
     Flight score as a function of payload configuration.
@@ -97,17 +88,13 @@ def flight_score(
         ----------
         payload_config : tuple[int]
             Number of each payload carried.
-        historical_ref : pd.DataFrame
-            Historical reference configurations.
-        components : pd.DataFrame
-            Components.
         params : AssumedParameters
-            Assumed parameters.
+            Assumed parameters for analysis.
 
         Returns
         -------
         float
             Flight score.
     """
-    factors = _flight_score_factors(payload_config, params, historical_ref, components)
+    factors = _flight_score_factors(payload_config, params)
     return np.prod(factors)

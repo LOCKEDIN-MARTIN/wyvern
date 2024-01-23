@@ -1,52 +1,11 @@
-from dataclasses import asdict, dataclass
 from io import StringIO
 
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from wyvern.layout.geom_utils import area_of_points, centroid_of_polyshape
-
-
-@dataclass
-class PlanformParameters:
-    """
-    Planform shape parameters for Night Fury.
-
-    Blended wing body with wing sweep.
-
-    """
-
-    name: str
-
-    # Centerbody dimensions
-    centerbody_halfspan: float
-    centerbody_chord: float
-
-    # Midbody dimensions
-    midbody_y: float
-    midbody_xle: float
-    midbody_chord: float
-
-    # Wing
-    wing_root_le: float
-    wing_root_chord: float
-    wing_halfspan: float
-    wing_taper_ratio: float
-    wing_root_le_sweep_angle: float
-
-    # Control surfaces
-    ctrl_surface_start_y: float
-    ctrl_surface_end_y: float
-    ctrl_surface_x_over_c: float  # how far it creeps up the end of the wing
-
-    @property
-    def to_dict(self):
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls, d):
-        return cls(**d)
+from wyvern.analysis.parameters import PlanformParameters
+from wyvern.utils.geom_utils import area_of_points, centroid_of_polyshape
 
 
 def planform_span_stations(conf: PlanformParameters) -> pd.DataFrame:
