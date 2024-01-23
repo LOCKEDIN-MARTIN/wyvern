@@ -1,7 +1,7 @@
 import json
 
 from wyvern.analysis.parameters import PlanformParameters
-from wyvern.layout.interactive_viz import planform_viz_interactive
+from wyvern.layout.viz import planform_viz_interactive
 
 if __name__ == "__main__":
     NF_844_A = PlanformParameters(

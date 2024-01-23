@@ -9,7 +9,7 @@
         "wing_root_le": 360,
         "wing_root_chord": 360,
         "wing_halfspan": 700,
-        "wing_taper_ratio": 0.33,
+        "wing_taper_ratio": 0.33333,
         "wing_root_le_sweep_angle": 40,
         "ctrl_surface_start_y": 600,
         "ctrl_surface_end_y": 800,

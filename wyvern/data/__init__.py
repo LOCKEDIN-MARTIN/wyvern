@@ -1,4 +1,10 @@
 from .components import ALL_COMPONENTS, AVIONICS_COMPONENTS, PROPULSION_COMPONENTS
+from .course import (
+    NUMBER_OF_STRAIGHTS,
+    NUMBER_OF_TURNS,
+    STRAIGHT_SEGMENT_LENGTH,
+    TURN_RADIUS,
+)
 from .historical import (
     ALL_HISTORICAL,
     BALSA_HISTORICAL,
@@ -6,12 +12,7 @@ from .historical import (
     RASSAM_CORRELATIONS,
 )
 from .payloads import PAYLOADS
-from .course import (
-    STRAIGHT_SEGMENT_LENGTH,
-    TURN_RADIUS,
-    NUMBER_OF_STRAIGHTS,
-    NUMBER_OF_TURNS,
-)
+from .planform_configs import PLANFORM_CONFIGS
 
 __all__ = [
     "ALL_COMPONENTS",
@@ -26,4 +27,5 @@ __all__ = [
     "TURN_RADIUS",
     "NUMBER_OF_STRAIGHTS",
     "NUMBER_OF_TURNS",
+    "PLANFORM_CONFIGS",
 ]

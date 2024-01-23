@@ -160,7 +160,8 @@ cython_debug/
 #.idea/
 **_version.py
 
-# output data files
+# output data files and plots
 *.json
+*.pdf
 # excl. wyvern/data/sources
 !wyvern/data/sources/*.json

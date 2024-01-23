@@ -1,8 +1,5 @@
-# interactive version of planform visualization
-
-import json
-
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
 from matplotlib.widgets import Slider
 
 from wyvern.layout.planform import (
@@ -12,6 +9,90 @@ from wyvern.layout.planform import (
     planform_span_stations,
     planform_stats,
 )
+
+
+def planform_viz(configuration: PlanformParameters):
+    """
+    Visualize the planform.
+    """
+    df = planform_span_stations(configuration)
+    pts = full_planform_points(df)
+    ctl_surface_pts, ctl_surface_pts_mirror = control_surface_points(df)
+
+    stats = planform_stats(configuration)
+    centroid = stats.loc[configuration.name, "overall_centroid"]
+    cb_centroid = stats.loc[configuration.name, "centerbody_centroid"]
+    wing_centroid = stats.loc[configuration.name, "wing_centroid"]
+    area = stats.loc[configuration.name, "overall_area"]
+    cb_area = stats.loc[configuration.name, "centerbody_half_area"]
+    wing_area = stats.loc[configuration.name, "wing_half_area"]
+
+    # plotting
+    plt.plot(pts[:, 0], pts[:, 1])
+    plt.plot(
+        ctl_surface_pts[:, 0],
+        ctl_surface_pts[:, 1],
+        label="hinge line",
+        color="C1",
+    )
+    plt.plot(
+        ctl_surface_pts_mirror[:, 0],
+        ctl_surface_pts_mirror[:, 1],
+        # no legend for this one
+        color="C1",
+    )
+    plt.axhline(centroid, color="k", linestyle="--", label=f"X_c = {centroid:.2f} mm")
+    plt.axhline(
+        cb_centroid,
+        color="C3",
+        linestyle="--",
+        label=f"X_c, CB = {cb_centroid:.2f} mm",
+    )
+    plt.axhline(
+        wing_centroid,
+        color="C2",
+        linestyle="--",
+        label=f"X_c, W = {wing_centroid:.2f} mm",
+    )
+
+    # styling
+    plt.gca().invert_yaxis()
+    plt.axis("equal")
+    plt.grid()
+    plt.title(
+        f"{configuration.name}\nArea: {2*wing_area:.3f} (W) + {2*cb_area:.3f} (CB) = {area:.3f} $m^2$"
+    )
+    plt.xlabel("Y (mm)")
+    plt.ylabel("X (mm)")
+    plt.legend()
+    plt.show()
+
+
+def planform_viz_simple(configuration: PlanformParameters):
+    """
+    Simple planform visualization for cleaner output.
+
+    Latex-ified
+    """
+    rcParams["text.usetex"] = True
+    # use computer modern serif font for all text
+    rcParams["font.family"] = "serif"
+
+    df = planform_span_stations(configuration)
+    pts = full_planform_points(df)
+
+    # plotting
+    plt.plot(pts[:, 0], pts[:, 1])
+
+    # styling
+    plt.gca().invert_yaxis()
+    plt.axis("equal")
+    plt.grid()
+    plt.title(f"{configuration.name}")
+    plt.xlabel("$y$ (mm)")
+    plt.ylabel("$x$ (mm)")
+    plt.savefig(f"{configuration.name}_planform.pdf")
+    plt.show()
 
 
 def planform_viz_interactive(base_config: PlanformParameters):
