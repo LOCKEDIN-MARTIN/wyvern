@@ -101,17 +101,19 @@ def planform_viz_interactive(base_config: PlanformParameters):
         stats = planform_stats(base_config)
 
         stats_text.set_text(
-            f"Overall Area: {stats.loc[base_config.name, 'overall_area']/1e6:.4f} m^2\n"
+            f"Overall Area: {stats.loc[base_config.name, 'overall_area']:.4f} m^2\n"
             f"Overall AR: {stats.loc[base_config.name, 'overall_aspect_ratio']:.4f}\n"
-            f"Wing Half Area: {stats.loc[base_config.name, 'wing_half_area']/1e6:.4f} m^2\n"
+            f"Overall (Full) Span: {stats.loc[base_config.name, 'overall_span']:.4f} mm\n"
+            f"Overall MAC: {stats.loc[base_config.name, 'overall_mean_aerodynamic_chord']:.4f} mm\n"
+            f"Wing Half Area: {stats.loc[base_config.name, 'wing_half_area']:.4f} m^2\n"
             f"Wing AR: {stats.loc[base_config.name, 'wing_aspect_ratio']:.4f}\n"
-            f"Centerbody Half Area: {stats.loc[base_config.name, 'centerbody_half_area']/1e6:.4f} m^2\n"
+            f"Centerbody Half Area: {stats.loc[base_config.name, 'centerbody_half_area']:.4f} m^2\n"
             f"Centerbody AR: {stats.loc[base_config.name, 'centerbody_aspect_ratio']:.4f}\n"
             f"Overall Centroid (x): {stats.loc[base_config.name, 'overall_centroid']:.4f} mm\n"
             f"Wing Centroid (x): {stats.loc[base_config.name, 'wing_centroid']:.4f} mm\n"
             f"Centerbody Centroid (x): {stats.loc[base_config.name, 'centerbody_centroid']:.4f} mm\n"
-            f"Proportion of Wing Area: {2*stats.loc[base_config.name, 'wing_half_area']/stats.loc[base_config.name, 'overall_area']:.4f}\n"
             f"Wing Mean Aerodynamic Chord: {stats.loc[base_config.name, 'wing_mean_aerodynamic_chord']:.4f} mm\n"
+            f"Proportion of Wing Area: {2*stats.loc[base_config.name, 'wing_half_area']/stats.loc[base_config.name, 'overall_area']:.4f}\n"
         )
 
         # resize plot to fit
@@ -156,29 +158,3 @@ def planform_viz_interactive(base_config: PlanformParameters):
         setattr(base_config, attr, slider.val)
 
     return base_config
-
-
-if __name__ == "__main__":
-    NF_844_A = PlanformParameters(
-        name="NF-844-A",
-        centerbody_halfspan=200,
-        centerbody_chord=780,
-        midbody_y=170,
-        midbody_xle=120,
-        midbody_chord=600,
-        wing_root_le=360,
-        wing_root_chord=360,
-        wing_halfspan=700,
-        wing_taper_ratio=0.33333,
-        wing_root_le_sweep_angle=40,
-        ctrl_surface_start_y=600,
-        ctrl_surface_end_y=800,
-        ctrl_surface_x_over_c=0.3,
-    )
-    updated_config = planform_viz_interactive(NF_844_A)
-
-    # save config
-    with open("revised_config.json", "w") as f:
-        json.dump(updated_config.to_dict, f, indent=4)
-
-    print("Saved revised config to revised_config.json")

@@ -244,29 +244,35 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
     cb_ar = cb_span**2 / area_of_points(cb_pts)
     cb_centroid = centroid_of_polyshape(cb_pts)
 
-    # mean aerodynamic chord
+    # areas
+    area = area_of_points(full_pts) / 1e6
+    cb_area = area_of_points(cb_pts) / 1e6
+    wing_area = area_of_points(wing_pts) / 1e6
+
+    # wing mean aerodynamic chord
     # trapezoidal wing, so use a simplified formulation
     c_root = configuration.wing_root_chord
     c_tip = c_root * configuration.wing_taper_ratio
-    mac = 2 / 3 * (c_root + c_tip - c_root * c_tip / (c_root + c_tip))
+    wing_mac = 2 / 3 * (c_root + c_tip - c_root * c_tip / (c_root + c_tip))
 
-    # areas
-    area = area_of_points(full_pts)
-    cb_area = area_of_points(cb_pts)
-    wing_area = area_of_points(wing_pts)
+    # overall mean aerodynamic chord - wing area / wing span
+    span = (cb_span + wing_span) * 2
+    overall_mac = area * 1e6 / span
 
     return pd.DataFrame(
         {
             "overall_area": area,
+            "overall_span": overall_span,
+            "overall_mean_aerodynamic_chord": overall_mac,
             "overall_aspect_ratio": overall_ar,
             "overall_centroid": overall_centroid[1],
             "wing_half_area": wing_area,
+            "wing_mean_aerodynamic_chord": wing_mac,
             "wing_aspect_ratio": wing_ar,
             "wing_centroid": wing_centroid[1],
             "centerbody_half_area": cb_area,
             "centerbody_aspect_ratio": cb_ar,
             "centerbody_centroid": cb_centroid[1],
-            "wing_mean_aerodynamic_chord": mac,
         },
         index=[configuration.name],
     )
@@ -321,7 +327,7 @@ def viz_planform(configuration: PlanformParameters):
     plt.axis("equal")
     plt.grid()
     plt.title(
-        f"{configuration.name}\nArea: {2*wing_area/1e6:.3f} (W) + {2*cb_area/1e6:.3f} (CB) = {area/1e6:.3f} $m^2$"
+        f"{configuration.name}\nArea: {2*wing_area:.3f} (W) + {2*cb_area:.3f} (CB) = {area:.3f} $m^2$"
     )
     plt.xlabel("Y (mm)")
     plt.ylabel("X (mm)")
