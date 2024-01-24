@@ -135,6 +135,39 @@ def span_stations_to_avl(df: pd.DataFrame) -> str:
     return buf.getvalue()
 
 
+def span_stations_to_tikz(df: pd.DataFrame) -> str:
+    """
+    Convert a DataFrame of span stations to TikZ code for plotting.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame of span stations.
+
+    Returns
+    -------
+    str
+        TikZ code for plotting.
+    """
+    buf = StringIO()
+
+    pts = full_planform_points(df) / 100
+
+    # plot the planform
+    buf.write(r"\begin{scope}[y=-1cm, x=1cm]")
+    buf.write("\n")
+    buf.write(r"\draw[thick] ")
+    for i, (x, y) in enumerate(pts):
+        if i == 0:
+            buf.write(f"({x}, {y}) ")
+        else:
+            buf.write(f"-- ({x}, {y}) ")
+    buf.write(";\n")
+    buf.write(r"\end{scope}")
+
+    return buf.getvalue()
+
+
 def full_planform_points(df: pd.DataFrame) -> np.ndarray:
     """
     Convert a planform DataFrame into a set of coordinates for plotting.
@@ -146,6 +179,19 @@ def full_planform_points(df: pd.DataFrame) -> np.ndarray:
     - XTE
 
     The DataFrame must be sorted by Y ascending.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame representing the planform. Each row represents a point
+        on the planform, and each column represents a property of the point.
+
+    Returns
+    -------
+    np.ndarray
+        A 2D numpy array of coordinates. Each row of the array represents
+        a point on the planform, and the two columns represent the x and y
+        coordinates of the point.
     """
 
     # first, plot (y, xle) and afterwards (y, xte)

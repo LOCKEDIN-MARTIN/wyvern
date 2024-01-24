@@ -2,7 +2,7 @@ import numpy as np
 from pandas import DataFrame
 
 from wyvern.analysis.parameters import WingSizingParameters
-from wyvern.performance.takeoff import crazy_takeoff_func
+from wyvern.sizing.takeoff import crazy_takeoff_func
 
 
 def aircraft_cl_max_estimate(sweep_angle: float, airfoil_cl_max: float):
@@ -95,9 +95,3 @@ def wing_loading_estimate(
     )
 
     return df
-
-
-def power_to_weight(
-    ws_values: DataFrame,
-):
-    pass

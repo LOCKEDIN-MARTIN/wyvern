@@ -12,7 +12,8 @@ dependencies = [
     "numpy",        # essential math library
     "matplotlib",   # plotting
     "pandas",       # data processing and formatting
-    "openpyxl"      # for reading excel files using pandas
+    "openpyxl",     # for reading excel files using pandas
+    "jinja2",       # templating for latex table generation
 ]
 
 [project.urls]
