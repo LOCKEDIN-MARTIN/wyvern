@@ -35,9 +35,9 @@ def flight_estimates(
     aircraft_CL = lift_per_regime / flight_regimes["dynamic_pressure"] / total_area
 
     # rough lift distribution approximation
-    lift_per_span_centerline = lift_per_regime / overall_span
-    lift_per_span_wing = (
-        lift_per_span_centerline * 4 / np.pi
+    lift_per_span_wing = lift_per_regime / overall_span
+    lift_per_span_centerline = (
+        lift_per_span_wing * 4 / np.pi
     )  # rectangle with same area as ellipse; height
 
     centerbody_cl = (
