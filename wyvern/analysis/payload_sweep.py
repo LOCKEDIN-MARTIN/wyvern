@@ -5,9 +5,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from wyvern.analysis.parameters import PayloadSizingParameters
-from wyvern.metrics import cargo_units
-from wyvern.metrics.scoring import _flight_score_factors
 from wyvern.performance.energy import energy_consumption
+from wyvern.performance.scoring import _flight_score_factors, cargo_units
 from wyvern.sizing import (
     payload_mass,
     total_mass,
