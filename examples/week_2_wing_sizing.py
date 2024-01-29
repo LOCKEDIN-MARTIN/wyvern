@@ -1,7 +1,19 @@
 from wyvern.analysis.parameters import WingSizingParameters
+from wyvern.data import RASSAM_CORRELATIONS
 from wyvern.data.planform_configs import PLANFORM_CONFIGS
 from wyvern.performance.aerodynamics import flight_estimates
 from wyvern.sizing.wing_sizing import wing_loading_estimate
+
+# calculate average of S_wet / S_ref
+
+historical = RASSAM_CORRELATIONS
+
+s_wet = historical["Total Wetted Area, m"]
+s_ref = historical["Wing Area m^2"]
+
+s_wet_s_ref = s_wet / s_ref
+
+print(f"Average s_wet/s_ref: {s_wet_s_ref.mean():.3f}")
 
 params = WingSizingParameters(
     takeoff_power=180,
