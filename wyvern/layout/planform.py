@@ -280,13 +280,14 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
     # just wings
     wing_pts = wing_points(df)
     wing_span = wing_pts[:, 0].max() - wing_pts[:, 0].min()
-    wing_ar = wing_span**2 / area_of_points(wing_pts)
+    wing_ar = wing_span**2 / area_of_points(wing_pts) * 2
+    # multiply by 2 because two wing halves
     wing_centroid = centroid_of_polyshape(wing_pts)
 
     # just centerbody
     cb_pts = centerbody_points(df)
     cb_span = cb_pts[:, 0].max() - cb_pts[:, 0].min()
-    cb_ar = cb_span**2 / area_of_points(cb_pts)
+    cb_ar = cb_span**2 / area_of_points(cb_pts) * 2
     cb_centroid = centroid_of_polyshape(cb_pts)
 
     # areas
@@ -311,10 +312,12 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
             "overall_mean_aerodynamic_chord": overall_mac,
             "overall_aspect_ratio": overall_ar,
             "overall_centroid": overall_centroid[1],
+            "wing_span": wing_span,
             "wing_half_area": wing_area,
             "wing_mean_aerodynamic_chord": wing_mac,
             "wing_aspect_ratio": wing_ar,
             "wing_centroid": wing_centroid[1],
+            "centerbody_span": cb_span,
             "centerbody_half_area": cb_area,
             "centerbody_aspect_ratio": cb_ar,
             "centerbody_centroid": cb_centroid[1],

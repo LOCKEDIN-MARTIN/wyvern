@@ -5,6 +5,7 @@ from wyvern.analysis.parameters import WingSizingParameters
 from wyvern.data import (
     TURN_RADIUS,
 )
+from wyvern.utils.constants import RHO, G
 
 
 def generate_flight_regimes(params: WingSizingParameters) -> DataFrame:
@@ -21,11 +22,8 @@ def generate_flight_regimes(params: WingSizingParameters) -> DataFrame:
 
     """
 
-    g_0 = 9.80665
-    rho = 1.225  # kg/m^3
-
     # Compute load factor in turn
-    n = np.sqrt((params.turn_speed**2 / (g_0 * TURN_RADIUS)) ** 2 + 1)
+    n = np.sqrt((params.turn_speed**2 / (G * TURN_RADIUS)) ** 2 + 1)
 
     # the rest follows
 
@@ -35,10 +33,10 @@ def generate_flight_regimes(params: WingSizingParameters) -> DataFrame:
         {
             "load_factor": [1, n, 1, 1],
             "dynamic_pressure": [
-                0.5 * rho * params.stall_speed**2,
-                0.5 * rho * params.turn_speed**2,
-                0.5 * rho * params.cruise_speed**2,
-                0.5 * rho * takeoff_speed**2,
+                0.5 * RHO * params.stall_speed**2,
+                0.5 * RHO * params.turn_speed**2,
+                0.5 * RHO * params.cruise_speed**2,
+                0.5 * RHO * takeoff_speed**2,
             ],
             "speed": [
                 params.stall_speed,

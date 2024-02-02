@@ -35,11 +35,22 @@ def test_area_of_points():
     assert area_of_points(polygon) == pytest.approx(100.0)
 
 
-def test_sweep_angle_along_chord():
+def test_sweep_angle_along_chord_1():
     taper_ratio = 0.8329422983
     le_sweep = 64.7890871
     qc_sweep = 63.91877902
     ar = 1.123689329
+
+    assert sweep_angle_along_chord(taper_ratio, ar, 0.25, le_sweep, 0) == pytest.approx(
+        qc_sweep
+    )
+
+
+def test_sweep_angle_along_chord_2():
+    taper_ratio = 0.3544350689
+    le_sweep = 64.7890871
+    qc_sweep = 59.7540846
+    ar = 1.16521672
 
     assert sweep_angle_along_chord(taper_ratio, ar, 0.25, le_sweep, 0) == pytest.approx(
         qc_sweep
