@@ -8,7 +8,7 @@ from wyvern.performance.flight_regimes import generate_flight_regimes
 from wyvern.sizing.parasitic_drag import cd0_zeroth_order
 
 
-def flight_estimates(
+def flight_estimates_week_2(
     wing_sizing: WingSizingParameters, planform: PlanformParameters, takeoff_mass: float
 ):
     """

@@ -1,7 +1,7 @@
 from wyvern.analysis.parameters import WingSizingParameters
 from wyvern.data import RASSAM_CORRELATIONS
 from wyvern.data.planform_configs import PLANFORM_CONFIGS
-from wyvern.performance.aerodynamics import flight_estimates
+from wyvern.performance.aerodynamics import flight_estimates_week_2
 from wyvern.sizing.wing_sizing import wing_loading_estimate
 
 # calculate average of S_wet / S_ref
@@ -43,7 +43,9 @@ print(f"Design wing loading: {w_s_design:.3f} kg/m^2")
 print(f"Design wing area: {takeoff_mass / 1000 / w_s_design:.3f} m^2")
 
 
-results = flight_estimates(params, PLANFORM_CONFIGS["NF-844-B-REV1"], takeoff_mass)
+results = flight_estimates_week_2(
+    params, PLANFORM_CONFIGS["NF-844-B-REV1"], takeoff_mass
+)
 print(results)
 
 print(results.to_latex(float_format="%.3f"))

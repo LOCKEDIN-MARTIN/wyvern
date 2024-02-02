@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 
-from wyvern.utils.geom_utils import area_of_points, centroid_of_polyshape
+from wyvern.utils.geom_utils import (
+    area_of_points,
+    centroid_of_polyshape,
+    sweep_angle_along_chord,
+)
 
 
 def test_centroid_of_polyshape():
@@ -29,3 +33,14 @@ def test_area_of_points():
         [[0, 0], [10, 0], [10, 10], [0, 10]],
     )
     assert area_of_points(polygon) == pytest.approx(100.0)
+
+
+def test_sweep_angle_along_chord():
+    taper_ratio = 0.8329422983
+    le_sweep = 64.7890871
+    qc_sweep = 63.91877902
+    ar = 1.123689329
+
+    assert sweep_angle_along_chord(taper_ratio, ar, 0.25, le_sweep, 0) == pytest.approx(
+        qc_sweep
+    )
