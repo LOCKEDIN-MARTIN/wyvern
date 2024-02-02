@@ -2,6 +2,7 @@ import numpy as np
 from pandas import DataFrame
 
 from wyvern.analysis.parameters import WingSizingParameters
+from wyvern.sizing.parasitic_drag import cd0_zeroth_order
 from wyvern.sizing.takeoff import crazy_takeoff_func
 
 
@@ -12,24 +13,6 @@ def aircraft_cl_max_estimate(sweep_angle: float, airfoil_cl_max: float):
     CL_max = 0.9 * CL_max_airfoil * cos(sweep_angle)
     """
     return 0.9 * airfoil_cl_max * np.cos(np.radians(sweep_angle))
-
-
-def cd0_estimate(c_fe: float, s_wet_s_ref) -> float:
-    """Estimate the parasitic drag coefficient using a crude method.
-
-    Parameters
-    ----------
-    c_fe : float
-        Skin friction coefficient.
-    s_wet_s_ref : float
-        Wetted area to wing area ratio.
-
-    Returns
-    -------
-    float
-        parasitic drag coefficient.
-    """
-    return c_fe * s_wet_s_ref
 
 
 def wing_loading_estimate(
@@ -51,7 +34,7 @@ def wing_loading_estimate(
     """
     rho = 1.225  # kg/m^3
     CL_max = aircraft_cl_max_estimate(params.sweep_angle, params.airfoil_cl_max)
-    CD0 = cd0_estimate(params.c_fe, params.s_wet_s_ref)
+    CD0 = cd0_zeroth_order(params.c_fe, params.s_wet_s_ref)
 
     g0 = 9.80665
 

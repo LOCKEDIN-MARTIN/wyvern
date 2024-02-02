@@ -37,3 +37,43 @@ def area_of_points(points: npt.NDArray[np.floating]):
     x, y = points.T
 
     return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+
+
+def sweep_angle_along_chord(
+    taper_ratio: float,
+    ar: float,
+    calc_x_c: float,
+    ref_sweep: float,
+    ref_x_c: float = 0,
+) -> float:
+    """
+    Given the sweep angle at a certain point along a tapered wing,
+    calculate the sweep angle at any other point along the chord.
+
+    Parameters
+    ----------
+    taper_ratio : float
+        Taper ratio of the wing (0 < taper_ratio < 1).
+        equal to c_tip / c_root
+    ar : float
+        Aspect ratio of the wing.
+    calc_x_c : float
+        Chordwise position to calculate the sweep angle at.
+    ref_sweep : float
+        Sweep angle at the reference point, in degrees.
+    ref_x_c : float, optional
+        Chordwise position of the reference point, by default 0 (leading edge).
+
+    Returns
+    -------
+    float
+        Sweep angle at the calculated point, in degrees.
+
+    """
+
+    return np.degrees(
+        np.arctan(
+            np.tan(np.radians(ref_sweep))
+            - 4 / ar * (calc_x_c - ref_x_c) * (1 - taper_ratio) / (1 + taper_ratio)
+        )
+    )

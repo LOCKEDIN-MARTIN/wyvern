@@ -2,13 +2,13 @@ import numpy as np
 from pandas import DataFrame
 
 from wyvern.analysis.parameters import PlanformParameters, WingSizingParameters
-from wyvern.layout import planform_span_stations, planform_stats
+from wyvern.layout import planform_stats
 from wyvern.performance.energy import course_lengths
 from wyvern.performance.flight_regimes import generate_flight_regimes
-from wyvern.sizing.wing_sizing import cd0_estimate
+from wyvern.sizing.parasitic_drag import cd0_zeroth_order
 
 
-def flight_estimates(
+def flight_estimates_week_2(
     wing_sizing: WingSizingParameters, planform: PlanformParameters, takeoff_mass: float
 ):
     """
@@ -46,7 +46,7 @@ def flight_estimates(
     wing_cl = lift_per_span_wing / wing_mac / flight_regimes["dynamic_pressure"]
 
     # estimate CD using crude methods
-    cd0 = cd0_estimate(wing_sizing.c_fe, wing_sizing.s_wet_s_ref)
+    cd0 = cd0_zeroth_order(wing_sizing.c_fe, wing_sizing.s_wet_s_ref)
     aircraft_CD = (
         cd0
         + aircraft_CL**2
