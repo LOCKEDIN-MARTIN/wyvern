@@ -22,7 +22,7 @@ params = PayloadSizingParameters(
     planform_area=0.566,
     propulsive_efficiency=0.5,
     configuration_bonus=1.3,
-    short_takeoff=False,
+    short_takeoff=True,
     stability_distance=0,
 )
 

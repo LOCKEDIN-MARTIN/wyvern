@@ -4,10 +4,12 @@ from matplotlib.widgets import Slider
 
 from wyvern.layout.planform import (
     PlanformParameters,
+    centerbody_points,
     control_surface_points,
     full_planform_points,
     planform_span_stations,
     planform_stats,
+    wing_points,
 )
 
 
@@ -81,8 +83,20 @@ def planform_viz_simple(configuration: PlanformParameters):
     df = planform_span_stations(configuration)
     pts = full_planform_points(df)
 
+    wing_pts = wing_points(df)
+    cb_pts = centerbody_points(df)
+
     # plotting
-    plt.plot(pts[:, 0], pts[:, 1])
+    plt.plot(
+        pts[:, 0],
+        pts[:, 1],
+    )
+
+    # shade in wing and centerbody
+    (a1,) = plt.fill(wing_pts[:, 0], wing_pts[:, 1], color="C2", alpha=0.5)
+    (a2,) = plt.fill(cb_pts[:, 0], cb_pts[:, 1], color="C3", alpha=0.5)
+
+    plt.legend([a1, a2], ["Wing", "Centerbody"])
 
     # styling
     plt.gca().invert_yaxis()
@@ -91,7 +105,12 @@ def planform_viz_simple(configuration: PlanformParameters):
     plt.xlabel("$y$ (mm)")
     plt.ylabel("$x$ (mm)")
     plt.savefig(f"{configuration.name}_planform.pdf")
-    plt.savefig(f"{configuration.name}_planform.png", dpi=300, transparent=True)
+    plt.savefig(
+        f"{configuration.name}_planform.png",
+        dpi=300,
+        transparent=True,
+        bbox_inches="tight",
+    )
     plt.show()
 
 
