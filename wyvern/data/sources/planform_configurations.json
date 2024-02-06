@@ -46,5 +46,21 @@
         "ctrl_surface_start_y": 600,
         "ctrl_surface_end_y": 800,
         "ctrl_surface_x_over_c": 0.3
+    },
+    {
+        "name": "NF-844-D",
+        "centerbody_halfspan": 185,
+        "centerbody_chord": 780,
+        "midbody_y": 92.5,
+        "midbody_xle": 120,
+        "midbody_chord": 600,
+        "wing_root_le": 215,
+        "wing_root_chord": 400,
+        "wing_halfspan": 665,
+        "wing_taper_ratio": 0.3,
+        "wing_root_le_sweep_angle": 30,
+        "ctrl_surface_start_y": 600,
+        "ctrl_surface_end_y": 800,
+        "ctrl_surface_x_over_c": 0.3
     }
 ]

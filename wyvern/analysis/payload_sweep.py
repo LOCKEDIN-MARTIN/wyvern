@@ -3,14 +3,17 @@ from typing import Sequence
 
 import pandas as pd
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
 
 from wyvern.analysis.parameters import PayloadSizingParameters
+from wyvern.performance.aerodynamics import cl_required, ld_at_speed, load_factor
 from wyvern.performance.energy import energy_consumption
 from wyvern.performance.scoring import _flight_score_factors, cargo_units
 from wyvern.sizing import (
     payload_mass,
     total_mass,
 )
+from wyvern.utils.constants import G
 
 
 def sweep_payload_configs(
@@ -38,6 +41,7 @@ def sweep_payload_configs(
         payload_mass_ = payload_mass(config)
         total_mass_ = total_mass(config, params.as_mass_ratio, params.total_fixed_mass)
         empty_mass_ = total_mass_ - payload_mass_
+        aircraft_weight = total_mass_ / 1000 * G
 
         payload_fraction = payload_mass_ / total_mass_
         as_mass = params.as_mass_ratio * total_mass_
@@ -45,12 +49,40 @@ def sweep_payload_configs(
 
         reached_pf_cap = payload_fraction > 0.25
 
+        # AERO AND ENERGY
+        n = load_factor(params.turn_speed)
+        cl_cruise = cl_required(
+            params.cruise_speed,
+            aircraft_weight,
+            params.planform_area,
+        )
+        ld_cruise = ld_at_speed(
+            params.cruise_speed,
+            aircraft_weight,
+            params.aero_model,
+            params.planform_area,
+        )
+        cl_turn = cl_required(
+            params.turn_speed,
+            aircraft_weight * n,
+            params.planform_area,
+        )
+        ld_turn = ld_at_speed(
+            params.turn_speed,
+            aircraft_weight * n,
+            params.aero_model,
+            params.planform_area,
+        )
+
+        wing_loading = total_mass_ / 1000 / params.planform_area
+
         total_energy = (
             energy_consumption(
                 total_mass_,
                 params.cruise_speed,
                 params.turn_speed,
-                params.lift_to_drag_ratio,
+                params.aero_model,
+                params.planform_area,
             )
             / params.propulsive_efficiency
         )
@@ -64,7 +96,7 @@ def sweep_payload_configs(
             stb_score,
         ) = _flight_score_factors(config, params)
 
-        results[config] = {
+        results[int("".join(str(c) for c in config))] = {
             "num_ping_pong_balls": config[0],
             "num_golf_balls": config[1],
             "num_tennis_balls": config[2],
@@ -76,7 +108,14 @@ def sweep_payload_configs(
             "payload_fraction": payload_fraction,
             "reached_pf_cap": reached_pf_cap,
             "cargo_score_times_pf": cargo_score * pf_score,
+            "wing_loading": wing_loading,
+            "cl_cruise": cl_cruise,
+            "ld_cruise": ld_cruise,
+            "cl_turn": cl_turn,
+            "ld_turn": ld_turn,
             "total_energy": total_energy,
+            "cargo_pts_score": cargo_score,
+            "pf_score": pf_score,
             "efficiency_score": efficiency_score,
             "takeoff_bonus": tb_score,
             "configuration_bonus": cb_score,
@@ -97,6 +136,7 @@ def sensitivity_plot(
     params: PayloadSizingParameters,
     sensitivity: str,
     sensitivity_range: Sequence[float],
+    title: str = None,
 ):
     """
     Plots the flight scores for various payload configurations under varying
@@ -113,6 +153,9 @@ def sensitivity_plot(
     sensitivity_range : Sequence[float]
         List of values to vary the parameter over.
     """
+    rcParams["text.usetex"] = True
+    # use computer modern serif font for all text
+    rcParams["font.family"] = "serif"
 
     # make a big dataframe
     def do_sweep_at_param(param_value):
@@ -137,5 +180,8 @@ def sensitivity_plot(
     ax.set_ylabel("Flight Score")
     ax.legend()
     ax.grid()
-    plt.title(f"Flight Score vs. Payload Config\nfor Varying '{sensitivity}'")
+    if title is None:
+        plt.title(f"Flight Score vs. Payload Config\nfor Varying '{sensitivity}'")
+    plt.title(title)
+    plt.savefig(f"{sensitivity}_sensitivity.png", dpi=300, transparent=True)
     plt.show()

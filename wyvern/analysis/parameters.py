@@ -1,6 +1,8 @@
 import json
 from dataclasses import asdict, dataclass
 
+from wyvern.performance.models import QuadraticLDModel
+
 
 @dataclass
 class SerializableParameters:
@@ -32,9 +34,10 @@ class PayloadSizingParameters(SerializableParameters):
 
     total_fixed_mass: float  # i.e.. avionics, propulsion, landing gear; g
     as_mass_ratio: float  # aerostructural mass ratio
-    lift_to_drag_ratio: float  # this will turn into a function of speed eventually
+    aero_model: QuadraticLDModel  # Quadratic lift-drag model
     cruise_speed: float  # m/s, currently not sensitive to this
     turn_speed: float  # m/s
+    planform_area: float  # m^2
     propulsive_efficiency: float
     configuration_bonus: float = 1.0
     short_takeoff: bool = False

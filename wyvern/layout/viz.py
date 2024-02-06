@@ -87,11 +87,11 @@ def planform_viz_simple(configuration: PlanformParameters):
     # styling
     plt.gca().invert_yaxis()
     plt.axis("equal")
-    plt.grid()
     plt.title(f"{configuration.name}")
     plt.xlabel("$y$ (mm)")
     plt.ylabel("$x$ (mm)")
     plt.savefig(f"{configuration.name}_planform.pdf")
+    plt.savefig(f"{configuration.name}_planform.png", dpi=300, transparent=True)
     plt.show()
 
 
@@ -217,9 +217,9 @@ def planform_viz_interactive(base_config: PlanformParameters):
             ax=axs[f"sliders_{attr}"],
             label=attr,
             valmin=0,
-            valmax=getattr(base_config, attr) * 2
-            if getattr(base_config, attr) > 1
-            else 1,
+            valmax=(
+                getattr(base_config, attr) * 2 if getattr(base_config, attr) > 1 else 1
+            ),
             valinit=getattr(base_config, attr),
             valstep=5 if getattr(base_config, attr) > 1 else 0.01,
         )

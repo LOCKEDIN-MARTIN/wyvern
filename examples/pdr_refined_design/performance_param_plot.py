@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from wyvern.performance.models import QuadraticLDModel
 from wyvern.performance.plotting import plot_drag_polar, power_plot
 
-ld_model = QuadraticLDModel(c_d0=0.0318, e_inviscid=0.97, K=0.45, aspect_ratio=4.9)
+ld_model = QuadraticLDModel(c_d0=0.0318, e_inviscid=0.95, K=0.45, aspect_ratio=5.1)
 
 plot_drag_polar(ld_model)
 
@@ -27,4 +27,4 @@ plt.legend()
 plt.show()
 
 
-power_plot(ld_model, 2.804 * 9.81)
+power_plot(ld_model, 2.874 * 9.81)

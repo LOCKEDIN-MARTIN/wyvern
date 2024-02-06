@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -104,3 +105,21 @@ class QuadraticLDModel:
         Estimate the lift coefficient given a drag coefficient.
         """
         return np.sqrt((c_D - self.c_d0) / self.kappa)
+
+
+class CNSTLDModel(QuadraticLDModel):
+    """
+    Dummy class spoofing a constant lift-drag model for more
+    basic analyses.
+    """
+
+    # fake the constructor to set all the parameters to 0
+    def __init__(self, ld: float, *args: Any, **kwargs: Any):
+        self.ld = ld
+        super().__init__(0, 0, 0, 0)
+
+    def c_D(self, c_L: float):
+        return c_L / self.ld
+
+    def __str__(self) -> str:
+        return str(self.ld)

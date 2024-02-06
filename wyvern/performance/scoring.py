@@ -59,7 +59,11 @@ def _flight_score_factors(
 
     energy = (
         energy_consumption(
-            mass, params.cruise_speed, params.turn_speed, params.lift_to_drag_ratio
+            mass,
+            params.cruise_speed,
+            params.turn_speed,
+            params.aero_model,
+            params.planform_area,
         )
         / params.propulsive_efficiency
     )

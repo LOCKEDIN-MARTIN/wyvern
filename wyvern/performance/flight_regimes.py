@@ -1,11 +1,8 @@
-import numpy as np
 from pandas import DataFrame
 
 from wyvern.analysis.parameters import WingSizingParameters
-from wyvern.data import (
-    TURN_RADIUS,
-)
-from wyvern.utils.constants import RHO, G
+from wyvern.performance.aerodynamics import load_factor
+from wyvern.utils.constants import RHO
 
 
 def generate_flight_regimes(params: WingSizingParameters) -> DataFrame:
@@ -23,7 +20,7 @@ def generate_flight_regimes(params: WingSizingParameters) -> DataFrame:
     """
 
     # Compute load factor in turn
-    n = np.sqrt((params.turn_speed**2 / (G * TURN_RADIUS)) ** 2 + 1)
+    n = load_factor(params.turn_speed)
 
     # the rest follows
 
