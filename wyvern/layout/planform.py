@@ -168,6 +168,56 @@ def span_stations_to_tikz(df: pd.DataFrame) -> str:
     return buf.getvalue()
 
 
+def mean_aerodynamic_chords(df: pd.DataFrame) -> tuple[float, float, float]:
+    """
+    MAC of whole aircraft, cb, and wings from span stations
+    """
+    # for a trapazoidal wing, the MAC is given by
+    # 2/3 * (c_root + c_tip - c_root * c_tip / (c_root + c_tip))
+    # treat each segment as a trapezoid and sum the MACs
+
+    # skip control surfaces
+    c_0 = df.loc["center", "chord"]
+    c_1 = df.loc["midbody", "chord"]
+    c_2 = df.loc["wing_root", "chord"]
+    c_3 = df.loc["wing_tip", "chord"]
+
+    chords = [c_0, c_1, c_2, c_3]
+    macs = [0, 0, 0]
+
+    for i in range(1, len(chords)):
+        root_chord = chords[i - 1]
+        tip_chord = chords[i]
+        macs[i - 1] = (
+            2
+            / 3
+            * (
+                root_chord
+                + tip_chord
+                - root_chord * tip_chord / (root_chord + tip_chord)
+            )
+        )
+
+    # get areas of each segment
+    centerbody_1_pts = points_of_segment(df, "center", "midbody")
+    centerbody_2_pts = points_of_segment(df, "midbody", "wing_root")
+    wing_pts = points_of_segment(df, "wing_root", "wing_tip")
+
+    areas = [
+        area_of_points(centerbody_1_pts),
+        area_of_points(centerbody_2_pts),
+        area_of_points(wing_pts),
+    ]
+
+    # weighted average of MACs --> 1/(total area) * sum(MAC * area_i)
+    overall_mac = sum(m * a for m, a in zip(macs, areas)) / sum(areas)
+
+    cb_mac = sum(m * a for m, a in zip(macs[:2], areas[:2])) / sum(areas[:2])
+    wing_mac = macs[2]
+
+    return overall_mac, cb_mac, wing_mac
+
+
 def full_planform_points(df: pd.DataFrame) -> np.ndarray:
     """
     Convert a planform DataFrame into a set of coordinates for plotting.
@@ -211,34 +261,32 @@ def full_planform_points(df: pd.DataFrame) -> np.ndarray:
     return pts
 
 
+def points_of_segment(df: pd.DataFrame, start_seg: str, end_seg: str) -> np.ndarray:
+    """
+    Gets single-sided points of a segment of the planform.
+    """
+    segment = df.loc[start_seg:end_seg]
+
+    # first, plot (y, xle) and afterwards (y, xte)
+    # such that they connect to form a closed shape
+    pts_le = segment[["Y", "XLE"]].values
+    pts_te = segment[["Y", "XTE"]].values[::-1]
+
+    return np.concatenate([pts_le, pts_te])
+
+
 def wing_points(df: pd.DataFrame) -> np.ndarray:
     """
     Gets just the wing coordinates (single-sided).
     """
-    # only need to get the wing portion
-    wing = df.loc["wing_root":"wing_tip"]
-
-    # first, plot (y, xle) and afterwards (y, xte)
-    # such that they connect to form a closed shape
-    pts_le = wing[["Y", "XLE"]].values
-    pts_te = wing[["Y", "XTE"]].values[::-1]
-
-    return np.concatenate([pts_le, pts_te])
+    return points_of_segment(df, "wing_root", "wing_tip")
 
 
 def centerbody_points(df: pd.DataFrame) -> np.ndarray:
     """
     Gets just the centerbody coordinates (single-sided).
     """
-    # only need to get the wing portion
-    centerbody = df.loc["center":"wing_root"]
-
-    # first, plot (y, xle) and afterwards (y, xte)
-    # such that they connect to form a closed shape
-    pts_le = centerbody[["Y", "XLE"]].values
-    pts_te = centerbody[["Y", "XTE"]].values[::-1]
-
-    return np.concatenate([pts_le, pts_te])
+    return points_of_segment(df, "center", "wing_root")
 
 
 def control_surface_points(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
@@ -280,13 +328,14 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
     # just wings
     wing_pts = wing_points(df)
     wing_span = wing_pts[:, 0].max() - wing_pts[:, 0].min()
-    wing_ar = wing_span**2 / area_of_points(wing_pts)
+    wing_ar = wing_span**2 / area_of_points(wing_pts) * 2
+    # multiply by 2 because two wing halves
     wing_centroid = centroid_of_polyshape(wing_pts)
 
     # just centerbody
     cb_pts = centerbody_points(df)
     cb_span = cb_pts[:, 0].max() - cb_pts[:, 0].min()
-    cb_ar = cb_span**2 / area_of_points(cb_pts)
+    cb_ar = cb_span**2 / area_of_points(cb_pts) * 2
     cb_centroid = centroid_of_polyshape(cb_pts)
 
     # areas
@@ -294,15 +343,8 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
     cb_area = area_of_points(cb_pts) / 1e6
     wing_area = area_of_points(wing_pts) / 1e6
 
-    # wing mean aerodynamic chord
-    # trapezoidal wing, so use a simplified formulation
-    c_root = configuration.wing_root_chord
-    c_tip = c_root * configuration.wing_taper_ratio
-    wing_mac = 2 / 3 * (c_root + c_tip - c_root * c_tip / (c_root + c_tip))
-
-    # overall mean aerodynamic chord - wing area / wing span
-    span = (cb_span + wing_span) * 2
-    overall_mac = area * 1e6 / span
+    # MACs
+    overall_mac, cb_mac, wing_mac = mean_aerodynamic_chords(df)
 
     return pd.DataFrame(
         {
@@ -311,11 +353,14 @@ def planform_stats(configuration: PlanformParameters) -> pd.DataFrame:
             "overall_mean_aerodynamic_chord": overall_mac,
             "overall_aspect_ratio": overall_ar,
             "overall_centroid": overall_centroid[1],
+            "wing_span": wing_span,
             "wing_half_area": wing_area,
             "wing_mean_aerodynamic_chord": wing_mac,
             "wing_aspect_ratio": wing_ar,
             "wing_centroid": wing_centroid[1],
+            "centerbody_span": cb_span,
             "centerbody_half_area": cb_area,
+            "centerbody_mean_aerodynamic_chord": cb_mac,
             "centerbody_aspect_ratio": cb_ar,
             "centerbody_centroid": cb_centroid[1],
         },

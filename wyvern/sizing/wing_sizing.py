@@ -4,6 +4,7 @@ from pandas import DataFrame
 from wyvern.analysis.parameters import WingSizingParameters
 from wyvern.sizing.parasitic_drag import cd0_zeroth_order
 from wyvern.sizing.takeoff import crazy_takeoff_func
+from wyvern.utils.constants import RHO, G
 
 
 def aircraft_cl_max_estimate(sweep_angle: float, airfoil_cl_max: float):
@@ -32,20 +33,17 @@ def wing_loading_estimate(
     DataFrame
         Dataframe of W/S values for stall, cruise and takeoff.
     """
-    rho = 1.225  # kg/m^3
     CL_max = aircraft_cl_max_estimate(params.sweep_angle, params.airfoil_cl_max)
     CD0 = cd0_zeroth_order(params.c_fe, params.s_wet_s_ref)
 
-    g0 = 9.80665
-
-    weight = takeoff_mass / 1000 * g0  # N
+    weight = takeoff_mass / 1000 * G  # N
 
     # stall wing loading
-    q_stall = 0.5 * rho * params.stall_speed**2
-    ws_stall = q_stall * CL_max / g0  # kg/m^2
+    q_stall = 0.5 * RHO * params.stall_speed**2
+    ws_stall = q_stall * CL_max / G  # kg/m^2
 
     # cruise wing loading
-    q_cruise = 0.5 * rho * params.cruise_speed**2
+    q_cruise = 0.5 * RHO * params.cruise_speed**2
     ld_max = (
         1 / 2 * np.sqrt(np.pi * params.aspect_ratio * params.oswald_efficiency / CD0)
     )
@@ -53,7 +51,7 @@ def wing_loading_estimate(
     ws_cruise = (
         q_cruise
         * np.sqrt(CD0 * np.pi * params.oswald_efficiency * params.aspect_ratio)
-        / g0
+        / G
     )  # kg/m^2
 
     # takeoff

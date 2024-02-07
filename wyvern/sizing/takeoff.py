@@ -1,5 +1,7 @@
 import numpy as np
 
+from wyvern.utils.constants import RHO, G
+
 
 def crazy_takeoff_func(
     C_Lmax: float,
@@ -48,23 +50,21 @@ def crazy_takeoff_func(
     ---------
     Uses method derived from AER406 tutorial 2
     """
-    g0 = 9.80665
-    rho = 1.225
 
-    C4 = -(1.05**2) / (g0 * rho * C_Lmax)
-    C3 = 1.05 * v_hw / g0 * np.sqrt(2 / (rho * C_Lmax))
+    C4 = -(1.05**2) / (G * RHO * C_Lmax)
+    C3 = 1.05 * v_hw / G * np.sqrt(2 / (RHO * C_Lmax))
     C2 = s_TO * (
         T / W
         + 1.05**2 / (2 * C_Lmax) * (mu * C_Lgr - C_D0 - C_Lgr**2 / (np.pi * e * AR))
         - mu
-    ) - v_hw**2 / (2 * g0)
+    ) - v_hw**2 / (2 * G)
     C1 = 0
     C0 = (
         s_TO
-        * (rho * v_hw**2 / 4)
+        * (RHO * v_hw**2 / 4)
         * (mu * C_Lgr - C_D0 - C_Lgr**2 / (np.pi * e * AR))
     )
 
     results = np.polynomial.polynomial.polyroots([C0, C1, C2, C3, C4])
     # pick correct root
-    return results[3] ** 2 / g0
+    return results[3] ** 2 / G
