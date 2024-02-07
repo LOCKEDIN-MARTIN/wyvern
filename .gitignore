@@ -163,7 +163,8 @@ cython_debug/
 # output data files and plots
 *.json
 *.pdf
-# excl. wyvern/data/sources
-!wyvern/data/sources/*.json
 *.png
 *.csv
+# excl. wyvern/data/sources
+!wyvern/data/sources/*.json
+!wyvern/data/sources/*.csv
