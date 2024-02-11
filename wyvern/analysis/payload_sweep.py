@@ -152,6 +152,9 @@ def sensitivity_plot(
         Name of the parameter to vary.
     sensitivity_range : Sequence[float]
         List of values to vary the parameter over.
+
+
+    saving or showing the figure is the responsibility of the caller.
     """
     rcParams["text.usetex"] = True
     # use computer modern serif font for all text
@@ -183,5 +186,3 @@ def sensitivity_plot(
     if title is None:
         plt.title(f"Flight Score vs. Payload Config\nfor Varying '{sensitivity}'")
     plt.title(title)
-    plt.savefig(f"{sensitivity}_sensitivity.png", dpi=300, transparent=True)
-    plt.show()

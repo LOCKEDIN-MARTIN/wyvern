@@ -11,6 +11,8 @@ def plot_drag_polar(ld_model: QuadraticLDModel, cL_lims: tuple[float] = (-0.2, 1
     Plot the drag polar for a given lift and drag model.
 
     Includes line of tangency and maximum L/D point.
+
+    saving or showing the plot is up to the user.
     """
     cL_range = np.linspace(*cL_lims, 100)
     cD_range = ld_model.c_D(cL_range)
@@ -34,12 +36,6 @@ def plot_drag_polar(ld_model: QuadraticLDModel, cL_lims: tuple[float] = (-0.2, 1
     plt.title("Drag polar")
     plt.legend()
 
-    plt.savefig("drag_polar.png", dpi=600, transparent=True, bbox_inches="tight")
-
-    plt.show()
-
-    return None
-
 
 def power_plot(
     ld_model: QuadraticLDModel,
@@ -49,6 +45,8 @@ def power_plot(
 ):
     """
     Plot power required vs power available for a given wing loading.
+
+    saving or showing the plot is up to the user.
     """
     speed_range = np.linspace(4, 15, 100)
     power_range = np.array(
@@ -68,13 +66,3 @@ def power_plot(
     plt.grid()
     plt.title("Power Performance")
     plt.legend()
-
-    plt.savefig(
-        f"power_performance_prop_{propeller_model.name}.png",
-        dpi=600,
-        transparent=True,
-        bbox_inches="tight",
-    )
-    plt.show()
-
-    return None
