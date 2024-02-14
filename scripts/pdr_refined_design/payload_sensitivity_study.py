@@ -7,7 +7,8 @@ from wyvern.performance.models import CNSTLDModel, QuadraticLDModel
 from wyvern.sizing import aerostructural_mass_ratio, total_component_mass
 
 ld_model_cnst = CNSTLDModel(ld=9.39)
-ld_model_qd = QuadraticLDModel(c_d0=0.0318, e_inviscid=0.95, K=0.45, aspect_ratio=5.1)
+ld_model_qd = QuadraticLDModel(c_d0=0.0300, e_inviscid=0.95, K=0.45, aspect_ratio=5.106)
+print(ld_model_qd.kappa)
 
 # calculate aerostructural mass ratio and fixed component masses first
 total_fixed_mass = total_component_mass(ALL_COMPONENTS)
