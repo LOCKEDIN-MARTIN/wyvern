@@ -16,7 +16,7 @@
         "ctrl_surface_x_over_c": 0.3
     },
     {
-        "name": "NF-844-B-REV1",
+        "name": "NF-844-B-REV0",
         "centerbody_halfspan": 185,
         "centerbody_chord": 780,
         "midbody_y": 140,
@@ -32,7 +32,7 @@
         "ctrl_surface_x_over_c": 0.3
     },
     {
-        "name": "NF-844-B-REV2",
+        "name": "NF-844-B",
         "centerbody_halfspan": 185,
         "centerbody_chord": 780,
         "midbody_y": 92.50,
