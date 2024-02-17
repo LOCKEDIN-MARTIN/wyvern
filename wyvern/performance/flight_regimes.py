@@ -24,7 +24,7 @@ def generate_flight_regimes(params: WingSizingParameters) -> DataFrame:
 
     # the rest follows
 
-    takeoff_speed = params.stall_speed * 1.05
+    takeoff_speed = params.stall_speed * 1.15
 
     df = DataFrame(
         {

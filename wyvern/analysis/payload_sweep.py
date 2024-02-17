@@ -56,6 +56,7 @@ def sweep_payload_configs(
             aircraft_weight,
             params.planform_area,
         )
+        cd_cruise = params.aero_model.c_D(cl_cruise)
         ld_cruise = ld_at_speed(
             params.cruise_speed,
             aircraft_weight,
@@ -67,6 +68,7 @@ def sweep_payload_configs(
             aircraft_weight * n,
             params.planform_area,
         )
+        cd_turn = params.aero_model.c_D(cl_turn)
         ld_turn = ld_at_speed(
             params.turn_speed,
             aircraft_weight * n,
@@ -110,8 +112,10 @@ def sweep_payload_configs(
             "cargo_score_times_pf": cargo_score * pf_score,
             "wing_loading": wing_loading,
             "cl_cruise": cl_cruise,
+            "cd_cruise": cd_cruise,
             "ld_cruise": ld_cruise,
             "cl_turn": cl_turn,
+            "cd_turn": cd_turn,
             "ld_turn": ld_turn,
             "total_energy": total_energy,
             "cargo_pts_score": cargo_score,

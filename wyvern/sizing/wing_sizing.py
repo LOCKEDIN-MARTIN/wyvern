@@ -2,6 +2,7 @@ import numpy as np
 from pandas import DataFrame
 
 from wyvern.analysis.parameters import WingSizingParameters
+from wyvern.performance.aerodynamics import load_factor
 from wyvern.sizing.parasitic_drag import cd0_zeroth_order
 from wyvern.sizing.takeoff import crazy_takeoff_func
 from wyvern.utils.constants import RHO, G
@@ -54,6 +55,8 @@ def wing_loading_estimate(
         / G
     )  # kg/m^2
 
+    n = load_factor(params.turn_speed)
+
     # takeoff
     ws_takeoff = crazy_takeoff_func(
         CL_max,
@@ -70,9 +73,9 @@ def wing_loading_estimate(
 
     df = DataFrame(
         {
-            "W/S": [ws_stall, ws_cruise, ws_takeoff],
+            "W/S": [ws_stall, ws_takeoff, ws_cruise, ws_cruise / n],
         },
-        index=["Stall", "Cruise", "Takeoff"],
+        index=["Stall", "Takeoff", "Cruise", "Turn"],
     )
 
     return df

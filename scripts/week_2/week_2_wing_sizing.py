@@ -28,16 +28,16 @@ params = WingSizingParameters(
     takeoff_thrust=9.25,
     aspect_ratio=5.106,
     sweep_angle=30,
-    airfoil_cl_max=0.9,
+    airfoil_cl_max=1.2,
     s_wet_s_ref=2.1,
     c_fe=0.02,
-    cruise_speed=12,
-    turn_speed=11,
-    stall_speed=8,
+    cruise_speed=10,
+    turn_speed=10,
+    stall_speed=7,
     oswald_efficiency=0.9,
     takeoff_headwind=3,
     takeoff_distance=7.5,
-    ground_cl=0.1,
+    ground_cl=0.2,
     rolling_resistance_coefficient=0.1,
 )
 
@@ -136,9 +136,7 @@ def flight_estimates_week_2(
     return df
 
 
-results = flight_estimates_week_2(
-    params, PLANFORM_CONFIGS["NF-844-B-REV1"], takeoff_mass
-)
+results = flight_estimates_week_2(params, PLANFORM_CONFIGS["NF-844-D"], takeoff_mass)
 print(results)
 
 print(results.to_latex(float_format="%.3f"))
