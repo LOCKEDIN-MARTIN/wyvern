@@ -16,6 +16,8 @@ from wyvern.layout.planform import (
 def planform_viz(configuration: PlanformParameters):
     """
     Visualize the planform.
+
+    saving or showing the plot is up to the user.
     """
     df = planform_span_stations(configuration)
     pts = full_planform_points(df)
@@ -67,7 +69,6 @@ def planform_viz(configuration: PlanformParameters):
     plt.xlabel("Y (mm)")
     plt.ylabel("X (mm)")
     plt.legend()
-    plt.show()
 
 
 def planform_viz_simple(configuration: PlanformParameters):
@@ -75,6 +76,8 @@ def planform_viz_simple(configuration: PlanformParameters):
     Simple planform visualization for cleaner output.
 
     Latex-ified
+
+    saving or showing the plot is up to the user.
     """
     rcParams["text.usetex"] = True
     # use computer modern serif font for all text
@@ -104,14 +107,6 @@ def planform_viz_simple(configuration: PlanformParameters):
     plt.title(f"{configuration.name}")
     plt.xlabel("$y$ (mm)")
     plt.ylabel("$x$ (mm)")
-    plt.savefig(f"{configuration.name}_planform.pdf")
-    plt.savefig(
-        f"{configuration.name}_planform.png",
-        dpi=300,
-        transparent=True,
-        bbox_inches="tight",
-    )
-    plt.show()
 
 
 def planform_viz_interactive(base_config: PlanformParameters):

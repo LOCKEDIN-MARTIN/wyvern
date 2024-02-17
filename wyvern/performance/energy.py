@@ -43,7 +43,7 @@ def energy_consumption(
 
     # compute l/d in cruise and turn
     ld_cruise = ld_at_speed(cruise_speed, weight, aero_model, wing_area)
-    ld_turn = ld_at_speed(turn_speed, weight, aero_model, wing_area)
+    ld_turn = ld_at_speed(turn_speed, weight * n, aero_model, wing_area)
 
     (l_s, l_t) = course_lengths()
 

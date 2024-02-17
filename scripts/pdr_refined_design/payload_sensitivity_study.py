@@ -6,8 +6,9 @@ from wyvern.data import ALL_COMPONENTS, RASSAM_CORRELATIONS
 from wyvern.performance.models import CNSTLDModel, QuadraticLDModel
 from wyvern.sizing import aerostructural_mass_ratio, total_component_mass
 
-ld_model_cnst = CNSTLDModel(ld=9.39)
-ld_model_qd = QuadraticLDModel(c_d0=0.0318, e_inviscid=0.95, K=0.45, aspect_ratio=5.1)
+ld_model_cnst = CNSTLDModel(ld=9.8)
+ld_model_qd = QuadraticLDModel(c_d0=0.0320, e_inviscid=0.95, K=0.45, aspect_ratio=5.106)
+print(ld_model_qd.kappa)
 
 # calculate aerostructural mass ratio and fixed component masses first
 total_fixed_mass = total_component_mass(ALL_COMPONENTS)
@@ -31,14 +32,15 @@ as_m_ratios = [0.40, 0.45, 0.50, 0.55]
 
 payload_configs = [(8, i, 4) for i in range(0, 7)]
 
-plt.style.use("dark_background")
+# plt.style.use("dark_background")
 sensitivity_plot(
     payload_configs,
     params,
     "as_mass_ratio",
     as_m_ratios,
-    "Sensitivity to Structural Mass Fraction (at CNST L/D)",
+    f"Sensitivity to $W_s/W_0$ (at CNST L/D = {ld_model_cnst.ld:.2f})",
 )
+plt.savefig("as_mass_ratio_sensitivity.pdf", bbox_inches="tight")
 
 # assess sensitivity to lift-to-drag ratio
 ld_models = [CNSTLDModel(ld=i) for i in range(8, 12)]
@@ -47,8 +49,9 @@ sensitivity_plot(
     params,
     "aero_model",
     ld_models,
-    "Sensitivity to L/D",
+    f"Sensitivity to L/D (at CNST $W_s/W_0$ = {as_m_ratio:.2f})",
 )
+plt.savefig("ld_sensitivity.pdf", bbox_inches="tight")
 
 # swap in the quadratic model
 params.aero_model = ld_model_qd

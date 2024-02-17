@@ -11,6 +11,8 @@ def plot_drag_polar(ld_model: QuadraticLDModel, cL_lims: tuple[float] = (-0.2, 1
     Plot the drag polar for a given lift and drag model.
 
     Includes line of tangency and maximum L/D point.
+
+    saving or showing the plot is up to the user.
     """
     cL_range = np.linspace(*cL_lims, 100)
     cD_range = ld_model.c_D(cL_range)
@@ -34,11 +36,36 @@ def plot_drag_polar(ld_model: QuadraticLDModel, cL_lims: tuple[float] = (-0.2, 1
     plt.title("Drag polar")
     plt.legend()
 
-    plt.savefig("drag_polar.png", dpi=600, transparent=True, bbox_inches="tight")
 
-    plt.show()
+def thrust_plot(
+    ld_model: QuadraticLDModel,
+    wing_loading_Nm2: float,
+    wing_area_m2: float,
+    propeller_model: PropellerCurve,
+):
+    """
+    Plot thrust required vs thrust available for a given wing loading.
+    """
+    speed_range = np.linspace(4, 18, 100)
+    speed_range_ex = np.linspace(0, 18, 100)
+    thrust_range = np.array(
+        [
+            thrust_required(ld_model, s, wing_loading_Nm2, wing_area_m2)
+            for s in speed_range
+        ]
+    )
 
-    return None
+    # interpolant for thrust available
+    thrust_available = np.interp(speed_range_ex, propeller_model.v, propeller_model.T)
+
+    plt.plot(speed_range, thrust_range, label="$T_R$")
+    plt.plot(speed_range_ex, thrust_available, label="$T_A$")
+    plt.xlabel("Speed (m/s)")
+    plt.ylabel("Thrust (N)")
+    plt.xlim(0, 18)
+    plt.grid()
+    plt.title("Thrust Performance")
+    plt.legend()
 
 
 def power_plot(
@@ -49,8 +76,10 @@ def power_plot(
 ):
     """
     Plot power required vs power available for a given wing loading.
+
+    saving or showing the plot is up to the user.
     """
-    speed_range = np.linspace(4, 15, 100)
+    speed_range = np.linspace(4, 18, 100)
     power_range = np.array(
         [
             power_required(ld_model, s, wing_loading_Nm2, wing_area_m2)
@@ -61,20 +90,10 @@ def power_plot(
     # interpolant for power available
     power_available = np.interp(speed_range, propeller_model.v, propeller_model.P)
 
-    plt.plot(speed_range, power_range, label="Power required")
-    plt.plot(speed_range, power_available, label="Power available")
+    plt.plot(speed_range, power_range, label="$P_R$")
+    plt.plot(speed_range, power_available, label="$P_A$")
     plt.xlabel("Speed (m/s)")
     plt.ylabel("Power (W)")
     plt.grid()
     plt.title("Power Performance")
     plt.legend()
-
-    plt.savefig(
-        f"power_performance_prop_{propeller_model.name}.png",
-        dpi=600,
-        transparent=True,
-        bbox_inches="tight",
-    )
-    plt.show()
-
-    return None

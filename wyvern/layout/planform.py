@@ -135,7 +135,9 @@ def span_stations_to_avl(df: pd.DataFrame) -> str:
     return buf.getvalue()
 
 
-def span_stations_to_tikz(df: pd.DataFrame) -> str:
+def span_stations_to_tikz(df: pd.DataFrame,
+                          half: bool=False,
+                          shade_areas: bool=False) -> str:
     """
     Convert a DataFrame of span stations to TikZ code for plotting.
 
