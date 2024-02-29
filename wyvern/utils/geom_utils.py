@@ -77,3 +77,36 @@ def sweep_angle_along_chord(
             - 4 / ar * (calc_x_c - ref_x_c) * (1 - taper_ratio) / (1 + taper_ratio)
         )
     )
+
+
+def mirror_verts(
+    verts: npt.NDArray, axis: int = 0, negate: bool = True, skip_first: bool = True
+) -> npt.NDArray:
+    """Mirror vertices across an axis, assuming the positive side has already been defined.
+
+    Parameters
+    ----------
+    verts : npt.NDArray
+        Array of vertices.
+    axis : int, optional
+        Axis to mirror across, by default 0
+    negate : bool, optional
+        Negate the mirrored vertices, by default True
+        e.g. [1, 2, 3] -> [-3, -2, -1, 1, 2, 3]
+    skip_first : bool, optional
+        Skip the first vertex, by default True
+        e.g. [0, 1, 2, 3] -> [3, 2, 1, 0, 1, 2, 3]
+    """
+
+    # mirror the vertices
+    verts_mirrored = np.flip(verts, axis=axis)
+
+    # negate the mirrored vertices
+    if negate:
+        verts_mirrored = -verts_mirrored
+
+    # skip the first vertex (here, actually the last vertex of the mirrored array)
+    if skip_first:
+        verts_mirrored = verts_mirrored[:-1]
+
+    return np.concatenate((verts_mirrored, verts))
