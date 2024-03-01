@@ -48,6 +48,9 @@ def spar_height(
 
     spar_points = spar_x - rib_xle
 
+    ax = plt.figure().add_subplot(projection="3d")
+    plt.tight_layout()
+
     for i in range(num_ribs):
         # read points from section file
         scale_fac = rib_c[i]
@@ -59,8 +62,8 @@ def spar_height(
         # find breakpoint for top and bottom of section
         midpt = np.where(section_x == np.min(section_x))[0][0]
 
-        x_top = section_x[:midpt]
-        y_top = section_y[:midpt]
+        x_top = section_x[: midpt + 1]
+        y_top = section_y[: midpt + 1]
         x_bot = section_x[midpt:]
         y_bot = section_y[midpt:]
 
@@ -72,11 +75,18 @@ def spar_height(
         spar_tops[i] = np.interp(spar_points[i], x_top, y_top)
         spar_bots[i] = np.interp(spar_points[i], x_bot, y_bot)
 
-        if i < num_ribs / 2:
-            plt.plot(x_top + rib_xle[i], y_top, "r-")
-            plt.plot(x_bot + rib_xle[i], y_bot, "b-")
-            plt.plot([spar_x[i], spar_x[i]], [spar_tops[i], spar_bots[i]], "g-")
-            plt.axis("equal")
-            plt.savefig(f"spar_height_{i}.png")
+        ax.plot(x_top + rib_xle[i], rib_y[i] * np.ones_like(y_top), y_top, "r-")
+        ax.plot(x_bot + rib_xle[i], rib_y[i] * np.ones_like(y_bot), y_bot, "b-")
+        ax.plot(
+            [spar_x[i], spar_x[i]],
+            [rib_y[i], rib_y[i]],
+            [spar_tops[i], spar_bots[i]],
+            "g-",
+        )
+    ax.plot(spar_x, rib_y, spar_tops, "g-")
+    ax.plot(spar_x, rib_y, spar_bots, "g-")
 
+    ax.axis("equal")
+    plt.subplots_adjust(left=-0.6, right=1.6, top=1.6, bottom=-0.6)
+    ax.set_axis_off()
     return (spar_tops, spar_bots)
