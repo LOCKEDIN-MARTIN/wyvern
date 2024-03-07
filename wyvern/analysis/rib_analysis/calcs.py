@@ -87,6 +87,6 @@ def spar_height(
     ax.plot(spar_x, rib_y, spar_bots, "g-")
 
     ax.axis("equal")
-    plt.subplots_adjust(left=-0.6, right=1.6, top=1.6, bottom=-0.6)
+    plt.subplots_adjust(left=-0.8, right=1.7, top=1.7, bottom=-0.7)
     ax.set_axis_off()
     return (spar_tops, spar_bots)

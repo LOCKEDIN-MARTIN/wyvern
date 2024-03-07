@@ -61,6 +61,9 @@ ctrl_spar_x = (
     mirror_verts(np.array([195, 628]), negate=False) * 1e-3
 )  # m; (c/4 centerline to c/4 tip)
 
+# secondary spar
+ctrl_spar2_y = mirror_verts(np.array([185, 850])) * 1e-3  # m
+
 # Interpolate to rib locations
 # Chord at each rib
 rib_c = np.interp(rib_y, ctrl_y, ctrl_c)
@@ -83,6 +86,14 @@ def ell(y):
 rib_force = rib_loading(ell, rib_y)
 rib_s_stop, rib_s_bot = spar_height(rib_y, rib_c, rib_xle, spar_x, rib_sections)
 
+#
+plt.savefig("3d_structure.pdf")
+
+# switch to 2D view
+plt.gca().view_init(elev=0, azim=0)
+plt.subplots_adjust(left=-0.6, right=1.6, top=1.6, bottom=-0.6)
+plt.savefig("2d_structure.pdf")
+
 # Plots
 fig, axs = plt.subplots(3, 1, tight_layout=True, figsize=(8, 8))
 
@@ -98,15 +109,15 @@ axs[1].plot(
     "r-",
 )
 
-axs[2].plot(rib_y, rib_s_stop, "b-", label="Top of spar")
-axs[2].plot(rib_y, rib_s_bot, "g-", label="Bottom of spar")
+axs[2].plot(rib_y, rib_s_stop, "r-", label="Top of spar")
+axs[2].plot(rib_y, rib_s_bot, "b-", label="Bottom of spar")
 
 axs[0].set_xlabel("Spanwise position (m)")
 axs[0].set_ylabel("Chordwise position (m)")
 axs[0].set_title("Spar and Rib layout")
 axs[0].grid(True)
 
-axs[1].set_title("Structural Loading")
+axs[1].set_title("Structural Loading (n = 3)")
 axs[1].set_xlabel("Spanwise position (m)")
 ax1_twin.set_ylabel("Rib Load (N)", color="C0")
 axs[1].set_ylabel("Lift Distribution (N/m)", color="r")
@@ -116,6 +127,9 @@ axs[2].set_title("Spar Height")
 axs[2].set_xlabel("Spanwise position (m)")
 axs[2].set_ylabel("Height (m)")
 axs[2].legend()
+axs[2].grid(True)
+axs[2].axis("equal")
+plt.savefig("rib_spar_layout.pdf")
 
 plt.show()
 
