@@ -86,6 +86,13 @@ def ell(y):
 rib_force = rib_loading(ell, rib_y)
 rib_s_stop, rib_s_bot = spar_height(rib_y, rib_c, rib_xle, spar_x, rib_sections)
 
+
+with open("rib_spar_layout.txt", "w") as f:
+    f.write("y\t x\t z_top\t z_bot\t height\n")
+    for i in range(num_ribs):
+        f.write(
+            f"{rib_y[i]*1000:.2f}\t {spar_x[i]*1000:.2f}\t {rib_s_stop[i]*1000:.2f}\t {rib_s_bot[i]*1000:.2f}\t {1000*(rib_s_stop[i] - rib_s_bot[i]):.2f}\n"
+        )
 #
 plt.savefig("3d_structure.pdf")
 
