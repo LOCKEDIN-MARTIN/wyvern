@@ -166,6 +166,7 @@ cython_debug/
 *.png
 *.csv
 *.tex
+*.txt
 # excl. wyvern/data/sources
 !wyvern/data/sources/*.json
 !wyvern/data/sources/*.csv
