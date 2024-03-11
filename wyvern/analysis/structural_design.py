@@ -65,7 +65,7 @@ ctrl_spar_x = (
 
 # secondary spar
 ctrl_spar2_y = np.array([185, 850]) * 1e-3  # m
-ctrl_spar2_x = np.array([485, 688]) * 1e-3  # m
+ctrl_spar2_x = np.array([515, 688]) * 1e-3  # m
 # 3c/4 from wings to tip
 
 # hack: linear extrapolate from y=185 to y=0
