@@ -35,12 +35,14 @@ def rib_spar_structure_plot(
                 rib_y[j] * np.ones_like(airfoil.y_top),
                 airfoil.y_top,
                 "k-",
+                linewidth=0.5,
             )
             ax.plot(
                 airfoil.x_bot + rib_xle[j],
                 rib_y[j] * np.ones_like(airfoil.y_bot),
                 airfoil.y_bot,
                 "k-",
+                linewidth=0.5,
             )
             # plot spar lines
             ax.plot(

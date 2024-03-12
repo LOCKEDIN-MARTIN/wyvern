@@ -34,7 +34,7 @@ ctrl_y = mirror_verts(np.array([0, 92.5, 185, 850])) * 1e-3  # m
 ctrl_c = mirror_verts(np.array([780, 600, 400, 120]), negate=False) * 1e-3  # m
 # Leading Edge x-coordinates
 ctrl_xle = mirror_verts(np.array([0, 0.120, 0.215, 0.598]), negate=False)  # m
-ctrl_twist = np.array([7, 0, 7])  # degrees (for some reason, -ve is +ve)
+ctrl_twist = np.array([5, 0, 5])  # degrees (for some reason, -ve is +ve)
 
 # Rib Locations
 rib_y = mirror_verts(np.array([0, 92.5, 185, 318, 451, 584, 717, 850])) * 1e-3  # m
