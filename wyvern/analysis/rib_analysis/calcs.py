@@ -46,7 +46,7 @@ def get_section_coords(
     """
     Get the coordinates of a section.
     """
-    section_coords = np.loadtxt(StringIO(section)) * scale_fac
+    section_coords = section * scale_fac
 
     section_x = section_coords[:, 0]
     section_y = section_coords[:, 1]

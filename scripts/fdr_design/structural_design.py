@@ -1,5 +1,4 @@
-# WIP structural analysis and design script
-
+# Structural analysis and design script
 
 # Rib layout
 # Figuring out where the ribs intersect the spars
@@ -35,8 +34,6 @@ ctrl_y = mirror_verts(np.array([0, 92.5, 185, 850])) * 1e-3  # m
 ctrl_c = mirror_verts(np.array([780, 600, 400, 120]), negate=False) * 1e-3  # m
 # Leading Edge x-coordinates
 ctrl_xle = mirror_verts(np.array([0, 0.120, 0.215, 0.598]), negate=False)  # m
-# Sections at each stations
-ctrl_sections = [BOEING_VERTOL] * 3 + [NACA0018] + [BOEING_VERTOL] * 3
 ctrl_twist = np.array([7, 0, 7])  # degrees (for some reason, -ve is +ve)
 
 # Rib Locations
