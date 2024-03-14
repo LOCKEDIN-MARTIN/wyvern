@@ -8,7 +8,7 @@ from wyvern.sizing import aerostructural_mass_ratio, total_component_mass
 
 ld_model_cnst = CNSTLDModel(ld=9.8)
 ld_model_qd = QuadraticLDModel(
-    c_d0=0.0320, e_inviscid=0.95, K=0.45, aspect_ratio=5.106458
+    c_d0=0.02959, e_inviscid=0.95, K=0.45, aspect_ratio=5.106458
 )
 print(ld_model_qd.kappa)
 

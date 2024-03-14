@@ -33,7 +33,7 @@ def plot_drag_polar(ld_model: QuadraticLDModel, cL_lims: tuple[float] = (-0.2, 1
     plt.xlabel("$C_D$")
     plt.ylabel("$C_L$")
     plt.grid(linewidth=0.5, alpha=0.5)
-    plt.title("Drag polar")
+    plt.title("Drag polar", fontsize=10)
     plt.legend()
 
 

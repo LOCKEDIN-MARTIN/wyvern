@@ -7,7 +7,9 @@ from wyvern.performance.models import QuadraticLDModel
 from wyvern.performance.plotting import plot_drag_polar, power_plot, thrust_plot
 from wyvern.utils.constants import RHO
 
-ld_model = QuadraticLDModel(c_d0=0.0320, e_inviscid=0.95, K=0.45, aspect_ratio=5.106458)
+ld_model = QuadraticLDModel(
+    c_d0=0.02959, e_inviscid=0.95, K=0.45, aspect_ratio=5.106458
+)
 ws = 2.874 * 9.81
 
 # plt.style.use("dark_background")
@@ -91,12 +93,11 @@ ld = cL_range / cD_range
 ld_15 = cL_range**1.5 / cD_range
 plt.figure(figsize=(4, 3))
 plt.plot(cL_range, ld, label="$$C_L/C_D$$")
-plt.plot(cL_range, ld_15, label="$$C_L^{1.5}/C_D$$")
 
 plt.xlabel("$C_L$")
 plt.ylabel("Dimensionless")
 
 plt.grid(linewidth=0.5, alpha=0.5)
-plt.title("Performance parameters")
+plt.title("Performance parameters", fontsize=10)
 plt.legend()
-plt.savefig("clcd15.pdf", bbox_inches="tight")
+plt.savefig("clcd.pdf", bbox_inches="tight")

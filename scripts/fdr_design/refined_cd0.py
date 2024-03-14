@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
+from scipy.optimize import curve_fit
 
 from wyvern.data.airfoils import BOEING_VERTOL, NACA0018
 from wyvern.sizing.parasitic_drag import _drag_integrand, cd0_buildup, cfe_turbulent
@@ -38,6 +39,7 @@ CD0_wb, wetted_area = cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v_analysis, 
 CD0_winglet = (
     cfe_turbulent(RHO * v_analysis * ctrl_c[-1] / MU) * S_winglet / Sref
 )  # use k = 1 for winglet
+CD0_lg = 0.00821
 
 print(f"CD0 wb: {CD0_wb:.5f}")
 print(f"CD0 winglet: {CD0_winglet:.5f}")
@@ -93,28 +95,34 @@ plt.show()
 
 # plot cd0 vs speed
 
-# v_series = np.linspace(1, 15, 100)
+v_series = np.linspace(1, 15, 100)
 
-# cd0_series = [
-#     cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v, Sref)[0] for v in v_series
-# ]
+cd0_series = [
+    cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v, Sref)[0]
+    + cfe_turbulent(RHO * v_analysis * ctrl_c[-1] / MU) * S_winglet / Sref
+    + CD0_lg
+    + 0.005
+    for v in v_series
+]
 
 
-# # fit power curve
-# def power_curve(x, a, b):
-#     return a * x**b
+# fit power curve
+def power_curve(x, a, b):
+    return a * x**b
 
 
-# fit = curve_fit(power_curve, v_series, cd0_series, p0=[0.01, -0.01])
+fit = curve_fit(power_curve, v_series, cd0_series, p0=[0.01, -0.01])
 
-# print(f"CD0 = {fit[0][0]:.4f} * v^{fit[0][1]:.4f}")
+print(f"CD0 = {fit[0][0]:.4f} * v^{fit[0][1]:.4f}")
 
-# plt.figure()
-# plt.plot(v_series, cd0_series)
-# plt.title("CD0 vs Speed")
-# plt.xlabel("Speed (m/s)")
-# plt.ylabel("CD0")
-# plt.grid(linewidth=0.5, alpha=0.5)
+plt.figure(figsize=(6, 3))
+plt.plot(v_series, cd0_series, label="Data")
+plt.plot(v_series, power_curve(v_series, *fit[0]), "--", label="Fit")
+plt.title("$C_{D0}$ vs Speed", fontsize=10)
+plt.xlabel("Speed (m/s)")
+plt.ylabel("$C_{D0}$")
+plt.grid(linewidth=0.5, alpha=0.5)
+plt.legend()
 
-# plt.savefig("cd0_vs_speed.pdf", bbox_inches="tight")
-# plt.show()
+plt.savefig("cd0_vs_speed.pdf", bbox_inches="tight")
+plt.show()
