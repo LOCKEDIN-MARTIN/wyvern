@@ -62,7 +62,7 @@ def planform_viz(configuration: PlanformParameters):
     # styling
     plt.gca().invert_yaxis()
     plt.axis("equal")
-    plt.grid()
+    plt.grid(linewidth=0.5, alpha=0.5)
     plt.title(
         f"{configuration.name}\nArea: {2*wing_area:.3f} (W) + {2*cb_area:.3f} (CB) = {area:.3f} $m^2$"
     )

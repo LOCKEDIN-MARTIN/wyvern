@@ -186,7 +186,7 @@ def sensitivity_plot(
     ax.set_xlabel("Number of Golf Balls")
     ax.set_ylabel("Flight Score")
     ax.legend()
-    ax.grid()
+    ax.grid(linewidth=0.5, alpha=0.5)
     if title is None:
         plt.title(f"Flight Score vs. Payload Config\nfor Varying '{sensitivity}'")
     plt.title(title)

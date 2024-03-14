@@ -2,17 +2,26 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib import rcParams
 
 from wyvern.data.airfoils import BOEING_VERTOL, NACA0018
-from wyvern.sizing.parasitic_drag import _drag_integrand, cd0_buildup
+from wyvern.sizing.parasitic_drag import _drag_integrand, cd0_buildup, cfe_turbulent
+from wyvern.utils.constants import MU, RHO
 from wyvern.utils.geom_utils import mirror_verts
+
+# MPL settings
+rcParams["text.usetex"] = True
+# use computer modern serif font for all text
+rcParams["font.family"] = "serif"
+
 
 # aircraft parameters
 ctrl_y = mirror_verts(np.array([0, 92.5, 185, 850])) * 1e-3  # m
 # Wing chord
 ctrl_c = mirror_verts(np.array([780, 600, 400, 120]), negate=False) * 1e-3  # m
 
-Sref = 0.566
+Sref = 0.56595
+S_winglet = 0.04
 v_analysis = 10
 
 # load reference data (10 m/s)
@@ -22,63 +31,90 @@ xfoil_ref_data = np.loadtxt(
 
 
 sections = [BOEING_VERTOL] * 2 + [NACA0018] * 3 + [BOEING_VERTOL] * 2
-sweeps = np.array([30, 30, 0, 0, 0, 30, 30])
+sweeps = np.array([27, 27, 0, 0, 0, 27, 27])
 
-CD0, wetted_area = cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v_analysis, Sref)
+CD0_wb, wetted_area = cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v_analysis, Sref)
 
-print(f"CD0: {CD0:.4f}")
-print(f"Wetted Area: {wetted_area:.4f}")
+CD0_winglet = (
+    cfe_turbulent(RHO * v_analysis * ctrl_c[-1] / MU) * S_winglet / Sref
+)  # use k = 1 for winglet
+
+print(f"CD0 wb: {CD0_wb:.5f}")
+print(f"CD0 winglet: {CD0_winglet:.5f}")
+print(f"Wetted Area: {wetted_area:.5f}")
 
 
 # Plots
 
 y_series = np.linspace(0, 850, 200) * 1e-3
-
-
-xfoil_ref_cd = np.interp(y_series, xfoil_ref_data[:, 0], xfoil_ref_data[:, 2])
-
+xfoil_ref_cd = np.interp(y_series, xfoil_ref_data[:, 0] / 1000, xfoil_ref_data[:, 2])
 data = [
     _drag_integrand(y, ctrl_y, ctrl_c, sections, sweeps, v_analysis, all_outputs=True)
     for y in y_series
 ]
 
-c_i = [d[0] for d in data]
-sweep_i = [d[1] for d in data]
-tcmax = [d[2] for d in data]
-s = [d[3] for d in data]
-Re_i = [d[4] for d in data]
-cf_i = [d[5] for d in data]
-k_i = [d[6] for d in data]
+c_i = np.array([d[0] for d in data])
+sweep_i = np.array([d[1] for d in data])
+tcmax = np.array([d[2] for d in data])
+s = np.array([d[3] for d in data])
+Re_i = np.array([d[4] for d in data])
+cf_i = np.array([d[5] for d in data])
+k_i = np.array([d[6] for d in data])
+Q_i = np.array([d[7] for d in data])
+
+CD0_xfoil = np.trapz(xfoil_ref_cd * s / (wetted_area / 2), y_series)
+print(f"CD0 xfoil: {CD0_xfoil:.5f}")
 
 plt.figure(figsize=(12, 4))
 plt.plot(y_series, Re_i, color="C0")
-plt.title("Skin Drag")
+plt.title(f"Zero-Lift Drag Along Wing, $v = {v_analysis}$ m/s", fontsize=10)
 plt.xlabel("y (m)")
 plt.ylabel("Reynolds Number", color="C0")
-plt.grid()
+plt.grid(linewidth=0.5, alpha=0.5)
+plt.gca().tick_params(axis="y", colors="C0")
 
 plt.twinx()
-plt.plot(y_series, cf_i, color="C1")
-plt.ylabel("Skin Friction Coefficient", color="C1")
+plt.plot(
+    y_series,
+    k_i * cf_i * Q_i * wetted_area / Sref,
+    color="C1",
+    label="$k(y) c_f(y) Q(y) \\times S_{\mathrm{wet}}/S_{\mathrm{ref}}$",
+)
+plt.plot(y_series, xfoil_ref_cd, "--", color="C1", label="XFOIL $C_{d0}(y)$")
+plt.ylabel("Drag Coefficient", color="C1")
+plt.legend(loc="upper center")
 
-plt.savefig("cd0_buildup.pdf")
+# colour numbers like MATLAB
+plt.gca().tick_params(axis="y", colors="C1")
+
+plt.savefig("cd0_buildup.pdf", bbox_inches="tight")
 
 plt.show()
 
 # plot cd0 vs speed
 
-v_series = np.linspace(1, 15, 100)
+# v_series = np.linspace(1, 15, 100)
 
-cd0_series = [
-    cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v, Sref)[0] for v in v_series
-]
+# cd0_series = [
+#     cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v, Sref)[0] for v in v_series
+# ]
 
-plt.figure()
-plt.plot(v_series, cd0_series)
-plt.title("CD0 vs Speed")
-plt.xlabel("Speed (m/s)")
-plt.ylabel("CD0")
-plt.grid()
 
-plt.savefig("cd0_vs_speed.pdf")
-plt.show()
+# # fit power curve
+# def power_curve(x, a, b):
+#     return a * x**b
+
+
+# fit = curve_fit(power_curve, v_series, cd0_series, p0=[0.01, -0.01])
+
+# print(f"CD0 = {fit[0][0]:.4f} * v^{fit[0][1]:.4f}")
+
+# plt.figure()
+# plt.plot(v_series, cd0_series)
+# plt.title("CD0 vs Speed")
+# plt.xlabel("Speed (m/s)")
+# plt.ylabel("CD0")
+# plt.grid(linewidth=0.5, alpha=0.5)
+
+# plt.savefig("cd0_vs_speed.pdf", bbox_inches="tight")
+# plt.show()

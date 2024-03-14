@@ -7,7 +7,7 @@ chords = np.array([780, 600, 400, 120]) * 1e-3
 y_coords = np.array([0, 92.5, 185, 850]) * 1e-3
 sections = ["NACA", "NACA", "BOEING", "BOEING"]
 
-v = 7
+v = 10
 
 Re = RHO * v * chords / MU
 y_smooth = np.linspace(0, 850, 50) * 1e-3

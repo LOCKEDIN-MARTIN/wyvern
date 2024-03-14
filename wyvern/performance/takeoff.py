@@ -87,7 +87,6 @@ def takeoff_distance(
         Takeoff speed series
     s_series: np.ndarray
         Takeoff distance series
-
     """
 
     # these correlations are currently speed-independent

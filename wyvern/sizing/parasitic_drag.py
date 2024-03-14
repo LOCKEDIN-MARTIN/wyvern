@@ -143,7 +143,6 @@ def _drag_integrand(
     sections: list[np.ndarray],
     sweep_ang: np.ndarray,
     v: float,
-    xfoil_ref: np.ndarray = None,
     all_outputs: bool = False,
 ) -> float:
     """Integrand for the drag calculation."""
@@ -165,14 +164,13 @@ def _drag_integrand(
     # skin friction and form factor
     cf_i = cfe_turbulent(Re_i)
 
-    if xfoil_ref is not None:
-        cf_i = np.interp(y, y_stations, xfoil_ref)
+    Q_i = abs(y) / max(y_stations) * 0.4 + 1  # interference factor
 
     k_i = 1 + 2 * np.cos(np.pi / 180 * sweep_i) * tcmax + 100 * tcmax**4
 
     if all_outputs:
-        return c_i, sweep_i, tcmax, s, Re_i, cf_i, k_i
-    return cf_i * s * k_i
+        return c_i, sweep_i, tcmax, s, Re_i, cf_i, k_i, Q_i
+    return cf_i * s * k_i * Q_i
 
 
 def cd0_buildup(
@@ -195,6 +193,6 @@ def cd0_buildup(
 
     # integrate
     wetted_area = quad(area_integrand, y_stations[0], y_stations[-1], epsrel=1e-6)[0]
-    CD0 = quad(drag_integrand, y_stations[0], y_stations[-1])[0] / S_ref
+    CD0 = quad(drag_integrand, y_stations[0], y_stations[-1], epsrel=1e-6)[0] / S_ref
 
     return CD0, wetted_area

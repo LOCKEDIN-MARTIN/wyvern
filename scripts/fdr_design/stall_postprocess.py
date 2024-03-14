@@ -39,7 +39,7 @@ plt.plot(
     clmax,
     color="cornflowerblue",
     marker="o",
-    label="XFOIL Sectional $C_{\ell \mathrm{max}}$, $n_{\mathrm{crit}}=4$, $x_{TR} \leq 0.1$",
+    label="XFOIL Sectional $C_{\ell \mathrm{max}}$, $n_{\mathrm{crit}}=4$, $x_{TR} = 0.1$",
 )
 plt.plot(
     y_xflr * 1000,
@@ -47,7 +47,7 @@ plt.plot(
     color="red",
     label="XFLR5 $C_\ell$ Distribution (Inviscid VLM1)",
 )
-plt.grid(which="both")
+plt.grid(linewidth=0.5, alpha=0.5)
 plt.yticks(np.arange(0.3, 1.5, 0.15))
 plt.xlabel("Span Position (mm)")
 plt.ylabel("$C_\ell$")
@@ -58,7 +58,7 @@ plt.axvline(
     label=r"Onset of Stall, $y\approx780$ mm",
     linewidth=1,
 )
-plt.title("Stall Performance, $v=7$ m/s")
+plt.title("Stall Performance, $v=7$ m/s", fontsize=10)
 # data annotations
 for i, txt in enumerate(re_stations):
     plt.annotate(
@@ -69,6 +69,6 @@ for i, txt in enumerate(re_stations):
         ha="center",
     )
 plt.legend(loc="lower left")
-plt.savefig("clmax.pdf")
+plt.savefig("clmax.pdf", bbox_inches="tight")
 
 plt.show()

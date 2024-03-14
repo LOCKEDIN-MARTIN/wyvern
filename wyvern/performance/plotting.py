@@ -63,7 +63,7 @@ def thrust_plot(
     plt.xlabel("Speed (m/s)")
     plt.ylabel("Thrust (N)")
     plt.xlim(0, 18)
-    plt.grid()
+    plt.grid(linewidth=0.5, alpha=0.5)
     plt.title("Thrust Performance")
     plt.legend()
 
@@ -73,11 +73,13 @@ def power_plot(
     wing_loading_Nm2: float,
     wing_area_m2: float,
     propeller_model: PropellerCurve,
-):
+) -> float:
     """
     Plot power required vs power available for a given wing loading.
 
     saving or showing the plot is up to the user.
+
+    JANK: computes v of most excess power
     """
     speed_range = np.linspace(4, 18, 100)
     power_range = np.array(
@@ -90,10 +92,16 @@ def power_plot(
     # interpolant for power available
     power_available = np.interp(speed_range, propeller_model.v, propeller_model.P)
 
+    excess_power = power_available - power_range
+    v_excess = speed_range[np.argmax(excess_power)]
+
     plt.plot(speed_range, power_range, label="$P_R$")
     plt.plot(speed_range, power_available, label="$P_A$")
     plt.xlabel("Speed (m/s)")
     plt.ylabel("Power (W)")
-    plt.grid()
+    plt.xlim(0, 18)
+    plt.grid(linewidth=0.5, alpha=0.5)
     plt.title("Power Performance")
     plt.legend()
+
+    return v_excess
