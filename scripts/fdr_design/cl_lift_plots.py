@@ -19,7 +19,7 @@ linestyles = ["-.", "-", "--"]
 for config in configurations:
 
     # left plot for lift distribution, right plot for CL
-    fig, axs = plt.subplots(2, 1, figsize=(6, 4), sharex=True, tight_layout=True)
+    fig, axs = plt.subplots(2, 1, figsize=(5, 5), sharex=True, tight_layout=True)
 
     axs[0].set_ylabel("$\ell(y)$ (N/m)")
     axs[0].set_title("Lift Distribution (n = 1)", fontsize=10)
@@ -77,8 +77,13 @@ for config in configurations:
         )
 
     box = axs[0].get_position()
-    axs[0].legend(fontsize=8, loc="upper left", bbox_to_anchor=(0.98, 1), frameon=False)
-    axs[1].legend(fontsize=8, loc="upper left", bbox_to_anchor=(0.98, 1), frameon=False)
+    axs[0].legend(
+        fontsize=8,
+        loc="upper center",
+        bbox_to_anchor=(0.50, -0.1),
+        frameon=False,
+        ncol=4,
+    )
 
     axs[1].set_yticks([0, 0.3, 0.6, 0.9, 1.2])
     axs[1].set_ylim(0, 1.2)
