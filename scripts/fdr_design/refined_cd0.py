@@ -67,27 +67,41 @@ Q_i = np.array([d[7] for d in data])
 CD0_xfoil = np.trapz(xfoil_ref_cd * s / (wetted_area / 2), y_series)
 print(f"CD0 xfoil: {CD0_xfoil:.5f}")
 
-plt.figure(figsize=(12, 4))
-plt.plot(y_series, Re_i, color="C0")
+plt.figure(figsize=(8, 3.5))
+plt.plot(y_series * 1e3, Re_i, color="r")
 plt.title(f"Zero-Lift Drag Along Wing, $v = {v_analysis}$ m/s", fontsize=10)
-plt.xlabel("y (m)")
-plt.ylabel("Reynolds Number", color="C0")
+plt.xlabel("y (mm)")
+plt.ylabel("Reynolds Number", color="r")
 plt.grid(linewidth=0.5, alpha=0.5)
-plt.gca().tick_params(axis="y", colors="C0")
+plt.gca().tick_params(axis="y", colors="r")
 
 plt.twinx()
 plt.plot(
-    y_series,
+    y_series * 1e3,
     k_i * cf_i * Q_i * wetted_area / Sref,
-    color="C1",
+    color="k",
     label="$k(y) c_f(y) Q(y) \\times S_{\mathrm{wet}}/S_{\mathrm{ref}}$",
 )
-plt.plot(y_series, xfoil_ref_cd, "--", color="C1", label="XFOIL $C_{d0}(y)$")
-plt.ylabel("Drag Coefficient", color="C1")
+plt.plot(y_series * 1e3, xfoil_ref_cd, "--", color="k", label="XFOIL $C_{d0}(y)$")
+plt.ylabel("Drag Coefficient", color="k")
 plt.legend(loc="upper center")
 
+plt.xticks(
+    [
+        0,
+        92.5,
+        185,
+        318,
+        451,
+        584,
+        717,
+        850,
+    ]
+)
+plt.xlim(0, 850)
+
 # colour numbers like MATLAB
-plt.gca().tick_params(axis="y", colors="C1")
+plt.gca().tick_params(axis="y", colors="k")
 
 plt.savefig("cd0_buildup.pdf", bbox_inches="tight")
 
@@ -116,13 +130,13 @@ fit = curve_fit(power_curve, v_series, cd0_series, p0=[0.01, -0.01])
 print(f"CD0 = {fit[0][0]:.4f} * v^{fit[0][1]:.4f}")
 
 plt.figure(figsize=(6, 3))
-plt.plot(v_series, cd0_series, label="Data")
-plt.plot(v_series, power_curve(v_series, *fit[0]), "--", label="Fit")
+plt.plot(v_series, cd0_series, label="Data", color="k")
+plt.plot(v_series, power_curve(v_series, *fit[0]), "--r", label="Fit")
 plt.title("$C_{D0}$ vs Speed", fontsize=10)
 plt.xlabel("Speed (m/s)")
 plt.ylabel("$C_{D0}$")
 plt.grid(linewidth=0.5, alpha=0.5)
-plt.legend()
+plt.legend(frameon=False)
 
 plt.savefig("cd0_vs_speed.pdf", bbox_inches="tight")
 plt.show()

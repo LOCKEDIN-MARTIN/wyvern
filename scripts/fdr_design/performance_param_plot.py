@@ -23,10 +23,11 @@ v_rcmax = np.sqrt(2 * ws / (RHO * np.sqrt(3 * ld_model.c_d0 / ld_model.kappa)))
 
 plt.figure(figsize=(9, 4))
 plt.subplot(122)
-v_climb = power_plot(ld_model, ws, 0.56595, PROP_9X6)
+v_climb, v_max = power_plot(ld_model, ws, 0.56595, PROP_9X6)
 plt.title("Power Performance, 9x6E APC Propeller", fontsize=10)
-plt.axvline(x=v_rcmax, color="C5", linestyle="--")
-plt.axvline(x=v_climb, color="C6", linestyle="--")
+plt.axvline(x=v_rcmax, color="C1", linestyle="--", linewidth=1)
+plt.axvline(x=v_climb, color="C3", linestyle="--", linewidth=1)
+plt.axvline(x=v_max, color="C5", linestyle="--", linewidth=1)
 plt.text(
     v_rcmax + 0.1,
     16,
@@ -34,7 +35,7 @@ plt.text(
     ha="left",
     va="bottom",
     rotation=90,
-    color="C5",
+    color="C1",
 )
 plt.text(
     v_climb + 0.1,
@@ -43,15 +44,24 @@ plt.text(
     ha="left",
     va="bottom",
     rotation=90,
-    color="C6",
+    color="C3",
+)
+plt.text(
+    v_max - 0.1,
+    30,
+    "v$_{\mathrm{max}}$" + f" = {v_max:.2f} m/s",
+    ha="right",
+    va="bottom",
+    rotation=90,
+    color="C5",
 )
 
 plt.subplot(121)
 thrust_plot(ld_model, ws, 0.56595, PROP_9X6)
 plt.title("Thrust Performance, 9x6E APC Propeller", fontsize=10)
-plt.axvline(x=ld_model.v_ldmax(ws), color="C2", linestyle="--")
-plt.axvline(x=10, color="C3", linestyle="--")
-plt.axvline(x=7, color="C4", linestyle="--")
+plt.axvline(x=ld_model.v_ldmax(ws), color="C2", linestyle="--", linewidth=1)
+plt.axvline(x=10, color="C0", linestyle="--", linewidth=1)
+plt.axvline(x=7, color="C4", linestyle="--", linewidth=1)
 plt.text(
     ld_model.v_ldmax(ws) - 0.1,
     2.5,
@@ -68,7 +78,7 @@ plt.text(
     ha="left",
     va="bottom",
     rotation=90,
-    color="C3",
+    color="C0",
 )
 plt.text(
     6.9,
@@ -82,8 +92,10 @@ plt.text(
 plt.tight_layout()
 plt.savefig("power_thrust_performance.pdf", bbox_inches="tight")
 
+plt.figure(figsize=(8, 3))
+plt.subplot(121)
 plot_drag_polar(ld_model)
-plt.savefig("drag_polar.pdf", bbox_inches="tight")
+
 
 # plot L/D with CL, and L^1.5/D
 
@@ -91,13 +103,14 @@ cL_range = np.linspace(0, 1.2, 100)
 cD_range = ld_model.c_D(cL_range)
 ld = cL_range / cD_range
 ld_15 = cL_range**1.5 / cD_range
-plt.figure(figsize=(4, 3))
-plt.plot(cL_range, ld, label="$$C_L/C_D$$")
+plt.subplot(122)
+plt.plot(cL_range, ld, "-k", label="$$C_L/C_D$$")
 
 plt.xlabel("$C_L$")
-plt.ylabel("Dimensionless")
+plt.ylabel("$C_L/C_D$")
 
 plt.grid(linewidth=0.5, alpha=0.5)
-plt.title("Performance parameters", fontsize=10)
-plt.legend()
-plt.savefig("clcd.pdf", bbox_inches="tight")
+plt.title("Drag Efficiency Variation", fontsize=10)
+
+plt.tight_layout()
+plt.savefig("drag_polar.pdf", bbox_inches="tight")

@@ -9,6 +9,8 @@
 # spar shear stresses
 
 
+from pathlib import Path
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
@@ -27,6 +29,7 @@ n = 3.59  # load factor
 
 # Material properties; Balsa wood
 s_crush = 1e6  # Pa (crushing strength)
+s_rupture = 19e6  # Pa (rupture strength)
 
 # Wing geometry, defined via control points
 # Span stations
@@ -101,9 +104,18 @@ twist_elevon = np.interp([0.451, 0.717], ctrl_y, ctrl_twist)
 # Lift loading
 # - Each rib carries a portion of the lift
 # - The portion is equal to the integral of the lift distribution halfway between itself and its neighbours
+
+# data
+lift_path = Path(__file__).parent.parent.parent / "wyvern/data/sources/lift_dists"
+lift_data = np.genfromtxt(lift_path / "Full_cruise_L.csv", delimiter=",", skip_header=1)
+# normalize lift data
+T = np.trapz(lift_data[:, 1], lift_data[:, 0])
+lift_data[:, 1] = W0 * lift_data[:, 1] / T
+
+
 def ell(y):
-    # Elliptical lift distribution
-    return 4 * n * W0 / (np.pi * b) * np.sqrt(1 - (2 * y / b) ** 2)
+    # real lift distr
+    return np.interp(y, lift_data[:, 0], lift_data[:, 1]) * n
 
 
 rib_force = rib_loading(ell, rib_y)
@@ -112,7 +124,7 @@ rib_s2_stop, rib_s2_bot = spar_height(
     rib_y, rib_c, rib_xle, spar_2x, twist, rib_sections
 )
 
-
+"""
 # plot 3D views of spar and rib layout
 rib_spar_structure_plot(
     [rib_s_stop, rib_s2_stop],
@@ -124,7 +136,6 @@ rib_spar_structure_plot(
     twist,
     rib_sections,
 )
-
 
 with open("rib_spar_layout.txt", "w") as f:
     f.write("y\t x1\t z1_top\t z1_bot\t h1\tx2\t z2_top\t z2_bot\t h2\t\n")
@@ -144,6 +155,7 @@ plt.savefig("2d_structure.pdf", bbox_inches="tight")
 # side shot
 plt.gca().view_init(elev=0, azim=90)
 plt.savefig("side_structure.png", dpi=300)
+"""
 
 # latex plots
 rcParams["text.usetex"] = True
@@ -151,7 +163,7 @@ rcParams["text.usetex"] = True
 rcParams["font.family"] = "serif"
 
 # Plots
-fig, axs = plt.subplots(2, 1, tight_layout=True, figsize=(8, 6))
+fig, axs = plt.subplots(2, 1, tight_layout=True, sharex=True, figsize=(6, 6))
 
 for i in range(num_ribs):
     axs[0].plot([rib_y[i], rib_y[i]], [rib_xle[i], rib_xle[i] + rib_c[i]], "k-")
@@ -160,40 +172,36 @@ axs[0].plot(rib_y, spar_2x, color="darkseagreen", label="Secondary Spar")
 axs[0].invert_yaxis()
 
 ax1_twin = axs[1].twinx()
-ax1_twin.bar(rib_y, rib_force, width=0.05, color="C1", alpha=0.5, edgecolor="k")
+ax1_twin.bar(rib_y, rib_force, width=0.05, color="C1", alpha=0.8, edgecolor="k")
+axs[1].fill_between(
+    np.linspace(min(rib_y), max(rib_y), 100),
+    ell(np.linspace(min(rib_y), max(rib_y), 100)),
+    color="C0",
+    alpha=0.5,
+)
 axs[1].plot(
     np.linspace(min(rib_y), max(rib_y), 100),
     ell(np.linspace(min(rib_y), max(rib_y), 100)),
     color="C0",
 )
-
-# axs[2].plot(rib_y, rib_s_stop, "C0", label="Main Spar")
-# axs[2].plot(rib_y, rib_s_bot, "C0", label="_")
-# axs[2].plot(rib_y, rib_s2_stop, "C1", label="Secondary Spar")
-# axs[2].plot(rib_y, rib_s2_bot, "C1", label="_")
-
-
-axs[0].set_xlabel("Spanwise position (m)")
 axs[0].set_ylabel("Chordwise position (m)")
 axs[0].set_title("Spar and Rib layout", fontsize=10)
 axs[0].legend()
 axs[0].grid(linewidth=0.5, alpha=0.5)
 
 axs[1].set_title(f"Structural Loading (n = {n:.2f})", fontsize=10)
-axs[1].set_xlabel("Spanwise position (m)")
+axs[1].set_xlabel("y (mm)")
 ax1_twin.set_ylabel("Rib Load (N)", color="C1")
 axs[1].set_ylabel("Lift Distribution (N/m)", color="C0")
 # change ticks and axis colors similarly to MATLAB
 axs[1].tick_params(axis="y", colors="C0")
 ax1_twin.tick_params(axis="y", colors="C1")
 axs[1].grid(linewidth=0.5, alpha=0.5)
+axs[1].set_ylim(0, max(ell(rib_y)) * 1.1)
 
-# axs[2].set_title("Spar Height")
-# axs[2].set_xlabel("Spanwise position (m)")
-# axs[2].set_ylabel("Height (m)")
-# axs[2].legend()
-# axs[2].grid(True)
-# axs[2].axis("equal")
+axs[1].set_xticks(rib_y)
+axs[1].set_xticklabels([f"{y*1000:.0f}" for y in rib_y], rotation=45)
+
 plt.tight_layout()
 plt.savefig("rib_loads.pdf", bbox_inches="tight")
 
