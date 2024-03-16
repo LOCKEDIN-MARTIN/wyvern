@@ -140,32 +140,32 @@ class VariableCD0Model:
     e_inviscid: float
     K: float
     aspect_ratio: float
+    v_min = 1  # m/s
 
     def c_d0(self, v: float):
+        v = np.clip(v, self.v_min, None)
         return self.c_d0_a * v**self.c_d0_b
 
-    @property
-    def e(self):
+    def e(self, v: float):
         """
         Oswald efficiency factor, taking into account viscous drag
         contributions
         """
         return 1 / (
-            1 / (self.e_inviscid) + np.pi * self.K * self.aspect_ratio * self.c_d0
+            1 / (self.e_inviscid) + np.pi * self.K * self.aspect_ratio * self.c_d0(v)
         )
 
-    @property
-    def kappa(self):
-        return 1 / (np.pi * self.aspect_ratio * self.e)
+    def kappa(self, v: float):
+        return 1 / (np.pi * self.aspect_ratio * self.e(v))
 
     def c_D(self, c_L: float, v: float):
         """
         Estimate the drag coefficient given a lift coefficient.
         """
-        return self.c_d0(v) + self.kappa * c_L**2
+        return self.c_d0(v) + self.kappa(v) * c_L**2
 
     def c_L(self, c_D: float, v: float):
         """
         Estimate the lift coefficient given a drag coefficient.
         """
-        return np.sqrt((c_D - self.c_d0(v)) / self.kappa)
+        return np.sqrt((c_D - self.c_d0(v)) / self.kappa(v))

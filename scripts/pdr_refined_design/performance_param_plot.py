@@ -7,7 +7,7 @@ from wyvern.performance.models import QuadraticLDModel
 from wyvern.performance.plotting import plot_drag_polar, power_plot, thrust_plot
 
 ld_model = QuadraticLDModel(
-    c_d0=0.02959, e_inviscid=0.95, K=0.45, aspect_ratio=5.106458
+    c_d0=0.02959, e_inviscid=0.9131, K=0.45, aspect_ratio=5.106458
 )
 ws = 2.874 * 9.81
 

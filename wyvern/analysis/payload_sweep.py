@@ -141,6 +141,7 @@ def sensitivity_plot(
     sensitivity: str,
     sensitivity_range: Sequence[float],
     title: str = None,
+    labels: list[str] = None,
 ):
     """
     Plots the flight scores for various payload configurations under varying
@@ -176,11 +177,14 @@ def sensitivity_plot(
 
     # plot flight score wrt # golf balls for each param value
     fig, ax = plt.subplots()
-    for df, sens_value in zip(dfs, sensitivity_range):
+    if labels is None:
+        labels = sensitivity_range
+
+    for df, sens_value, label in zip(dfs, sensitivity_range, labels):
         ax.plot(
             df["num_golf_balls"],
             df["total_flight_score"],
-            label=f"{sens_value}",
+            label=f"{label}",
             marker="o",
         )
     ax.set_xlabel("Number of Golf Balls")
