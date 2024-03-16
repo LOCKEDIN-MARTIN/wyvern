@@ -25,10 +25,10 @@ cml_cg = cm_cl_data[:, 4]
 fig, axs = plt.subplots(1, 2, figsize=(8, 3), sharey=True, tight_layout=True)
 
 (h1,) = axs[0].plot(cm_alpha_data[:, 0], cma_cg, "k", label="CG = 0.380 m")
-(h2,) = axs[0].plot(cm_alpha_data[:, 0], cma_np, "r", label="CP = NP = 0.400 m")
+(h2,) = axs[0].plot(cm_alpha_data[:, 0], cma_np, "r", label="CG = NP = 0.400 m")
 
 axs[1].plot(cm_cl_data[:, 0], cml_cg, "k", label="_CG = 0.380 m")
-axs[1].plot(cm_cl_data[:, 0], cml_np, "r", label="_CP = NP = 0.400 m")
+axs[1].plot(cm_cl_data[:, 0], cml_np, "r", label="_CG = NP = 0.400 m")
 
 axs[0].set_xlabel(r"$\alpha$ (deg)")
 axs[0].set_ylabel(r"$C_m$")

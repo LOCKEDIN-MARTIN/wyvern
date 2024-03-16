@@ -15,8 +15,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 
-from wyvern.analysis.rib_analysis.calcs import rib_loading, spar_height
-from wyvern.analysis.rib_analysis.plots import rib_spar_structure_plot
+from wyvern.analysis.structures.plots import do_3d_plots
+from wyvern.analysis.structures.rib_calcs import rib_loading, spar_height
 from wyvern.data.airfoils import BOEING_VERTOL, NACA0018
 from wyvern.utils.constants import G
 from wyvern.utils.geom_utils import mirror_verts
@@ -45,10 +45,11 @@ rib_y = mirror_verts(np.array([0, 92.5, 185, 318, 451, 584, 717, 850])) * 1e-3  
 # Rib thickness
 rib_t = (
     mirror_verts(
-        np.array([1 / 8, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16]),
+        np.array([1 / 4, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16]),
         negate=False,
     )
     * 1e-3
+    * 25.4
 )  # m
 
 
@@ -124,38 +125,20 @@ rib_s2_stop, rib_s2_bot = spar_height(
     rib_y, rib_c, rib_xle, spar_2x, twist, rib_sections
 )
 
-"""
-# plot 3D views of spar and rib layout
-rib_spar_structure_plot(
-    [rib_s_stop, rib_s2_stop],
-    [rib_s_bot, rib_s2_bot],
+# Plotting
+do_3d_plots(
     rib_y,
     rib_c,
     rib_xle,
-    [spar_x, spar_2x],
+    spar_x,
+    spar_2x,
     twist,
     rib_sections,
+    rib_s_stop,
+    rib_s2_stop,
+    rib_s_bot,
+    rib_s2_bot,
 )
-
-with open("rib_spar_layout.txt", "w") as f:
-    f.write("y\t x1\t z1_top\t z1_bot\t h1\tx2\t z2_top\t z2_bot\t h2\t\n")
-    for i in range(num_ribs):
-        f.write(
-            f"{rib_y[i]*1000:.2f}\t {spar_x[i]*1000:.2f}\t {rib_s_stop[i]*1000:.2f}\t {rib_s_bot[i]*1000:.2f}\t {1000*(rib_s_stop[i] - rib_s_bot[i]):.1f} \t"
-            f"{spar_2x[i]*1000:.2f}\t {rib_s2_stop[i]*1000:.2f}\t {rib_s2_bot[i]*1000:.2f}\t {1000*(rib_s2_stop[i] - rib_s2_bot[i]):.1f}\n"
-        )
-#
-plt.savefig("3d_structure.pdf", bbox_inches="tight")
-
-# switch to 2D view
-plt.gca().view_init(elev=0, azim=0)
-plt.subplots_adjust(left=-0.6, right=1.6, top=1.6, bottom=-0.6)
-plt.savefig("2d_structure.pdf", bbox_inches="tight")
-
-# side shot
-plt.gca().view_init(elev=0, azim=90)
-plt.savefig("side_structure.png", dpi=300)
-"""
 
 # latex plots
 rcParams["text.usetex"] = True
