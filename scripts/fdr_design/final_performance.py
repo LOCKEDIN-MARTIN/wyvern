@@ -17,7 +17,7 @@ ld_model = QuadraticLDModel(
 
 # calculate aerostructural mass ratio and fixed component masses first
 total_fixed_mass = total_component_mass(ALL_COMPONENTS)
-as_mass = 737  # g
+as_mass = 765  # g
 
 params = PayloadSizingParameters(
     as_mass_ratio=0,

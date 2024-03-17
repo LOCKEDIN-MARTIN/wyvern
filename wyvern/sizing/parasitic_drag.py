@@ -142,13 +142,16 @@ def _drag_integrand(
     c: np.ndarray,
     sections: list[np.ndarray],
     sweep_ang: np.ndarray,
-    v: float,
+    v: float | np.ndarray,
     all_outputs: bool = False,
 ) -> float:
     """Integrand for the drag calculation."""
     # determine sectional properties
     c_i = np.interp(y, y_stations, c)
     sweep_i = np.interp(y, y_stations, sweep_ang)
+
+    if isinstance(v, np.ndarray):
+        v = np.interp(y, y_stations, v)
 
     # determine section by nearest neighbour
     section_i = sections[np.argmin(np.abs(y - y_stations))] * c_i
@@ -180,6 +183,7 @@ def cd0_buildup(
     sweep_ang: np.ndarray,
     v: float,
     S_ref: float,
+    prop_wash: np.ndarray = None,
 ) -> tuple[float, float]:
     """Estimate the parasitic drag coefficient using a more detailed method."""
 
@@ -189,7 +193,10 @@ def cd0_buildup(
         return _area_integrand(y, y_stations, c, sections)
 
     def drag_integrand(y: float):
-        return _drag_integrand(y, y_stations, c, sections, sweep_ang, v)
+        if prop_wash is not None:
+            return _drag_integrand(y, y_stations, c, sections, sweep_ang, v + prop_wash)
+        else:
+            return _drag_integrand(y, y_stations, c, sections, sweep_ang, v)
 
     # integrate
     wetted_area = quad(area_integrand, y_stations[0], y_stations[-1], epsrel=1e-6)[0]

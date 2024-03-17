@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from io import StringIO
 from typing import Callable
 
 import numpy as np
 import numpy.typing as npt
 from scipy.integrate import quad
-
+from wyvern.analysis.structures.abstractions import Structure
 
 @dataclass
 class AirfoilPoints:
@@ -35,10 +34,15 @@ def rib_loading(lift_distribution: Callable[[float], float], rib_y: npt.NDArray)
         else:
             bound_r = (rib_y[i] + rib_y[i + 1]) / 2
 
-        rib_force[i] = quad(lift_distribution, bound_l, bound_r)[0]
+        rib_force[i] = quad(lift_distribution, bound_l, bound_r, epsrel=1e-6)[0]
 
     return rib_force
 
+
+def rib_failure(structure: Structure, rib_force: npt.NDArray[np.floating]):
+    # crushing, shear, buckling
+
+    # crushing
 
 def get_section_coords(
     section: str, scale_fac: float, twist: float = 0, twist_xc: float = 0.5

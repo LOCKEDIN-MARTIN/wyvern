@@ -75,6 +75,21 @@ def sweep_payload_configs(
             params.aero_model,
             params.planform_area,
         )
+        cl_stall = cl_required(
+            7,
+            aircraft_weight,
+            params.planform_area,
+        )
+        cd_stall = params.aero_model.c_D(cl_stall)
+        ld_stall = cl_stall / cd_stall
+
+        cl_takeoff = cl_required(
+            8,
+            aircraft_weight,
+            params.planform_area,
+        )
+        cd_takeoff = params.aero_model.c_D(cl_takeoff)
+        ld_takeoff = cl_takeoff / cd_takeoff
 
         wing_loading = total_mass_ / 1000 / params.planform_area
 
@@ -117,6 +132,12 @@ def sweep_payload_configs(
             "cl_turn": cl_turn,
             "cd_turn": cd_turn,
             "ld_turn": ld_turn,
+            "cl_stall": cl_stall,
+            "cd_stall": cd_stall,
+            "ld_stall": ld_stall,
+            "cl_takeoff": cl_takeoff,
+            "cd_takeoff": cd_takeoff,
+            "ld_takeoff": ld_takeoff,
             "total_energy": total_energy,
             "cargo_pts_score": cargo_score,
             "pf_score": pf_score,

@@ -13,7 +13,7 @@ ld_model_qd = QuadraticLDModel(
 
 # calculate aerostructural mass ratio and fixed component masses first
 total_fixed_mass = total_component_mass(ALL_COMPONENTS)
-cad_mass = 737  # g
+cad_mass = 765  # g
 
 params = PayloadSizingParameters(
     as_mass_ratio=0,
@@ -31,7 +31,7 @@ params = PayloadSizingParameters(
 
 payload_configs = [(8, i, 4) for i in range(0, 7)]
 
-cad_masses = [600, 700, 740, 800, 900]
+cad_masses = [600, 700, 765, 800, 900]
 
 # plt.style.use("dark_background")
 sensitivity_plot(

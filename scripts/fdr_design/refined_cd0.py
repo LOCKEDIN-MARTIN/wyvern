@@ -25,6 +25,8 @@ Sref = 0.56595
 S_winglet = 0.04
 v_analysis = 10
 
+prop_wash = mirror_verts(np.array([0, 0, 0, 0]), negate=False) * (20 - v_analysis)
+
 # load reference data (10 m/s)
 xfoil_ref_data = np.loadtxt(
     Path(__file__).parent.parent.parent / "wyvern/data/sources/xfoil_cf_10ms.dat"
@@ -34,7 +36,9 @@ xfoil_ref_data = np.loadtxt(
 sections = [BOEING_VERTOL] * 2 + [NACA0018] * 3 + [BOEING_VERTOL] * 2
 sweeps = np.array([27, 27, 0, 0, 0, 27, 27])
 
-CD0_wb, wetted_area = cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v_analysis, Sref)
+CD0_wb, wetted_area = cd0_buildup(
+    ctrl_y, ctrl_c, sections, sweeps, v_analysis, Sref, prop_wash=prop_wash
+)
 
 CD0_winglet = (
     cfe_turbulent(RHO * v_analysis * ctrl_c[-1] / MU) * S_winglet / Sref
@@ -45,13 +49,19 @@ print(f"CD0 wb: {CD0_wb:.5f}")
 print(f"CD0 winglet: {CD0_winglet:.5f}")
 print(f"Wetted Area: {wetted_area:.5f}")
 
+margin = 0.005
+
+print(f"Total CD0: {CD0_wb + CD0_winglet + CD0_lg + margin:.5f}")
+
 
 # Plots
 
 y_series = np.linspace(0, 850, 200) * 1e-3
 xfoil_ref_cd = np.interp(y_series, xfoil_ref_data[:, 0] / 1000, xfoil_ref_data[:, 2])
 data = [
-    _drag_integrand(y, ctrl_y, ctrl_c, sections, sweeps, v_analysis, all_outputs=True)
+    _drag_integrand(
+        y, ctrl_y, ctrl_c, sections, sweeps, v_analysis + prop_wash, all_outputs=True
+    )
     for y in y_series
 ]
 
@@ -115,7 +125,7 @@ cd0_series = [
     cd0_buildup(ctrl_y, ctrl_c, sections, sweeps, v, Sref)[0]
     + cfe_turbulent(RHO * v_analysis * ctrl_c[-1] / MU) * S_winglet / Sref
     + CD0_lg
-    + 0.005
+    + margin
     for v in v_series
 ]
 
