@@ -1,9 +1,11 @@
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rcParams
 
 from wyvern.analysis.parameters import PayloadSizingParameters
 from wyvern.analysis.payload_sweep import sweep_payload_configs
 from wyvern.data import ALL_COMPONENTS, RASSAM_CORRELATIONS
+from wyvern.performance import energy
 from wyvern.performance.models import QuadraticLDModel
 from wyvern.sizing import aerostructural_mass_ratio, total_component_mass
 
@@ -29,7 +31,7 @@ params = PayloadSizingParameters(
     propulsive_efficiency=0.521,
     configuration_bonus=1.3,
     short_takeoff=True,
-    stability_distance=0,
+    stability_distance=100,
 )
 
 payload_configs = [(0, 0, 0)] + [(8, i, 4) for i in range(0, 7)]
@@ -50,9 +52,13 @@ params_pdr = PayloadSizingParameters(
     propulsive_efficiency=0.521,
     configuration_bonus=1.3,
     short_takeoff=True,
-    stability_distance=0,
+    stability_distance=100,
 )
+
+# CURSED PYTHON, NEVER DO THIS PLEASE
+energy.turn_fudge = 1.118
 results_pdr = sweep_payload_configs(payload_configs, params_pdr)
+energy.turn_fudge = 1.25
 
 
 fig, ax = plt.subplots(figsize=(5, 4))
@@ -62,6 +68,7 @@ ax.plot(
     marker="o",
     label="FDR",
     color="k",
+    zorder=10,
 )
 ax.plot(
     results_pdr["num_golf_balls"][1:],
@@ -76,6 +83,7 @@ ax.set_ylabel("Flight Score")
 ax.grid(linewidth=0.5, alpha=0.5)
 ax.title.set_text("Flight Score vs. Payload")
 ax.title.set_fontsize(10)
+ax.set_yticks(np.arange(30, 52, 2))
 ax.legend(frameon=False)
 
 # save the figure

@@ -94,15 +94,26 @@ def sweep_payload_configs(
         wing_loading = total_mass_ / 1000 / params.planform_area
 
         total_energy = (
-            energy_consumption(
-                total_mass_,
-                params.cruise_speed,
-                params.turn_speed,
-                params.aero_model,
-                params.planform_area,
+            sum(
+                energy_consumption(
+                    total_mass_,
+                    params.cruise_speed,
+                    params.turn_speed,
+                    params.aero_model,
+                    params.planform_area,
+                )
             )
             / params.propulsive_efficiency
         )
+        e_cruise, e_turn = energy_consumption(
+            total_mass_,
+            params.cruise_speed,
+            params.turn_speed,
+            params.aero_model,
+            params.planform_area,
+        )
+        e_cruise /= params.propulsive_efficiency
+        e_turn /= params.propulsive_efficiency
 
         (
             cargo_score,
@@ -139,6 +150,8 @@ def sweep_payload_configs(
             "cd_takeoff": cd_takeoff,
             "ld_takeoff": ld_takeoff,
             "total_energy": total_energy,
+            "cruise_energy": e_cruise,
+            "turn_energy": e_turn,
             "cargo_pts_score": cargo_score,
             "pf_score": pf_score,
             "efficiency_score": efficiency_score,

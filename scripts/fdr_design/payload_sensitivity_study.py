@@ -25,7 +25,7 @@ params = PayloadSizingParameters(
     propulsive_efficiency=0.521,
     configuration_bonus=1.3,
     short_takeoff=True,
-    stability_distance=0,
+    stability_distance=100,
 )
 
 
@@ -84,7 +84,7 @@ params_list = [
         propulsive_efficiency=0.521,
         configuration_bonus=1.3,
         short_takeoff=True,
-        stability_distance=0,
+        stability_distance=100,
     )
     for cad_mass in np.linspace(550, 950)
 ]
@@ -103,7 +103,7 @@ plt.title("Sensitivity to Build Efficiency", fontsize=10)
 plt.grid(linewidth=0.5, alpha=0.5)
 plt.legend(title="\# Golf Balls")
 plt.axvline(x=cad_mass, color="k", linestyle="--", label="_")
-plt.text(x=cad_mass - 10, y=25, s="Design Target", ha="right", va="bottom", rotation=90)
+plt.text(x=cad_mass - 10, y=48, s="Design Target", ha="right", va="bottom", rotation=90)
 plt.savefig("single_payload_empty_weight_sensitivity.pdf", bbox_inches="tight")
 
 # sensitivity to CD0
@@ -121,7 +121,7 @@ params_list = [
         propulsive_efficiency=0.521,
         configuration_bonus=1.3,
         short_takeoff=True,
-        stability_distance=0,
+        stability_distance=100,
     )
     for c in np.linspace(0.02, 0.05)
 ]
@@ -143,7 +143,7 @@ plt.legend(title="\# Golf Balls")
 plt.axvline(x=ld_model_qd.c_d0, color="k", linestyle="--", label="_")
 plt.text(
     x=ld_model_qd.c_d0 - 0.001,
-    y=55,
+    y=57,
     s="Design Target",
     ha="right",
     va="bottom",

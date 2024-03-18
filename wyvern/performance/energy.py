@@ -6,6 +6,8 @@ from wyvern.performance.distance import course_lengths
 from wyvern.performance.models import QuadraticLDModel
 from wyvern.utils.constants import RHO, G
 
+turn_fudge = 1.25
+
 
 def energy_consumption(
     mass: float,
@@ -13,7 +15,7 @@ def energy_consumption(
     turn_speed: float,
     aero_model: QuadraticLDModel,
     wing_area: float,
-) -> float:
+) -> tuple[float, float]:
     """
     "Raw" energy consumption over the course. Divide by propulsive efficiency to get effective battery energy consumption.
 
@@ -47,4 +49,7 @@ def energy_consumption(
 
     (l_s, l_t) = course_lengths()
 
-    return weight * (l_s / ld_cruise + n * l_t / ld_turn)
+    e_cruise = weight * l_s / ld_cruise
+    e_turn = weight * n * l_t / ld_turn * turn_fudge
+
+    return e_cruise, e_turn
