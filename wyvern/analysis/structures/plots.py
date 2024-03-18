@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib import rcParams
 
 from wyvern.analysis.structures.abstractions import SparPoints, Structure
-from wyvern.analysis.structures.rib_calcs import get_section_coords
+from wyvern.analysis.structures.rib_calcs import RibFLoads, get_section_coords
 from wyvern.analysis.structures.spar_calcs import BeamDerivatives
 
 
@@ -237,10 +237,9 @@ def spar_plots(
     axs[1, 0].plot(spar_1.y * 1e3, spar_1.zbot * 1e3, "r-", label="_")
     axs[1, 0].plot(spar_2.y * 1e3, spar_2.ztop * 1e3, "r--", label="_Secondary Spar")
     axs[1, 0].plot(spar_2.y * 1e3, spar_2.zbot * 1e3, "r--", label="_")
-    axs[1, 0].set_title("Spar Profile")
+    axs[1, 0].set_title("Spar Profile (exaggerated)")
     axs[1, 0].set_xlabel("y (mm)")
     axs[1, 0].set_ylabel("z (mm)")
-    axs[1, 0].axis("equal")
 
     # deflections
     (h11,) = axs[1, 1].plot(y * 1000, bd1.deflection * 1000, "r-", label="_Main Spar")
@@ -266,3 +265,95 @@ def spar_plots(
         loc="center",
         bbox_to_anchor=(0.5, 0.5),
     )
+
+
+def rib_failure_plot(
+    rib_f_loads: RibFLoads,
+    rib_loading: npt.NDArray[np.floating],
+    y: npt.NDArray[np.floating],
+):
+    crushing_strength = 1e6
+    shear_strength = 1.10e6
+
+    # Plotting
+    rcParams["text.usetex"] = True
+    # use computer modern serif font for all text
+    rcParams["font.family"] = "serif"
+
+    fig, axs = plt.subplots(3, 1, figsize=(6, 6), tight_layout=True, sharex=True)
+
+    # Crushing
+    axs[0].bar(
+        y * 1000,
+        rib_f_loads.crushing / 1e6,
+        width=50,
+        color="C0",
+        alpha=0.8,
+        edgecolor="k",
+    )
+    axs[0].set_title("Rib Crushing", fontsize=10)
+    axs[0].set_ylabel("Crushing Stress (MPa)")
+    axs[0].axhline(
+        crushing_strength / 1e6 / 2,
+        color="r",
+        linestyle=":",
+        label="$\sigma_{\mathrm{crush}}$ (SF$=2$)",
+    )
+    axs[0].legend()
+    axs[0].grid(linewidth=0.5, alpha=0.5)
+    axs[0].set_ylim(0, 0.6)
+
+    # Shear
+    axs[1].bar(
+        y * 1000,
+        rib_f_loads.shear / 1e6,
+        width=50,
+        color="C0",
+        alpha=0.8,
+        edgecolor="k",
+        label="_",
+    )
+    axs[1].set_title("Rib Shear, $h_{\mathrm{min}} = 7$ mm", fontsize=10)
+    axs[1].set_ylabel("Shear Stress (MPa)")
+    axs[1].axhline(
+        shear_strength / 1e6 / 2,
+        color="r",
+        linestyle=":",
+        label="$\sigma_{\mathrm{shear}}$ (SF$=2$)",
+    )
+    axs[1].legend()
+    axs[1].grid(linewidth=0.5, alpha=0.5)
+    axs[1].set_ylim(0, 0.6)
+
+    # Buckling
+    axs[2].bar(
+        y * 1000,
+        rib_f_loads.buckling_1 / 2,
+        width=50,
+        color="C0",
+        alpha=0.8,
+        edgecolor="k",
+        label="At Main Spar",
+        zorder=1,
+    )
+    axs[2].bar(
+        y * 1000,
+        rib_f_loads.buckling_2 / 2,
+        width=50,
+        color="C1",
+        alpha=0.8,
+        edgecolor="k",
+        label="At Secondary Spar",
+        zorder=0,
+    )
+    axs[2].plot(y * 1000, rib_loading / 2, "r--", marker="o", label="Actual Loading")
+    axs[2].set_title("Rib Buckling, $c_{\mathrm{min}} = 50$ mm, SF = 2", fontsize=10)
+    axs[2].set_ylabel("Critical Load / 2 (N)")
+    axs[2].grid(linewidth=0.5, alpha=0.5)
+    axs[2].legend(ncol=3)
+    # scale as log
+    axs[2].set_yscale("log")
+    axs[2].set_ylim(1e-1, 1e3)
+
+    axs[2].set_xlabel("y (mm)")
+    axs[2].set_xticks(y * 1000)

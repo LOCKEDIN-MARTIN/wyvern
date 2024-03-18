@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 from scipy.integrate import quad
-from wyvern.analysis.structures.abstractions import Structure
+
 
 @dataclass
 class AirfoilPoints:
@@ -13,6 +13,14 @@ class AirfoilPoints:
     y_top: npt.NDArray[np.floating]
     x_bot: npt.NDArray[np.floating]
     y_bot: npt.NDArray[np.floating]
+
+
+@dataclass
+class RibFLoads:
+    crushing: npt.NDArray[np.floating]  # Pa; strength must be GREATER than this
+    shear: npt.NDArray[np.floating]  # Pa; strength must be GREATER than this
+    buckling_1: npt.NDArray[np.floating]  # N; loads must be LESS than this
+    buckling_2: npt.NDArray[np.floating]  # N; loads must be LESS than this
 
 
 def rib_loading(lift_distribution: Callable[[float], float], rib_y: npt.NDArray):
@@ -39,10 +47,42 @@ def rib_loading(lift_distribution: Callable[[float], float], rib_y: npt.NDArray)
     return rib_force
 
 
-def rib_failure(structure: Structure, rib_force: npt.NDArray[np.floating]):
+def rib_failure(
+    structure,
+    rib_force: npt.NDArray[np.floating],
+    min_rib_h: float,
+    min_rib_continuous_c: float,
+    spar_width: float,
+) -> RibFLoads:
     # crushing, shear, buckling
 
     # crushing
+    rib_thicknesses = structure.rib.t
+
+    spar_1_h = structure.spars[0].h
+    spar_2_h = structure.spars[1].h
+
+    A_crush = rib_thicknesses * spar_width
+    s_crush = rib_force / A_crush
+
+    print(s_crush / 1e6)
+
+    # shear
+    A_shear = rib_thicknesses * min_rib_h
+    s_shear = rib_force / A_shear
+
+    # buckling
+    E = 2.55e9  # Pa
+
+    I = min_rib_continuous_c * rib_thicknesses**3 / 12
+
+    f_buckling_1 = np.pi**2 * E * I / (spar_1_h**2)
+    f_buckling_2 = np.pi**2 * E * I / (spar_2_h**2)
+    print(f_buckling_1)
+    print(rib_force)
+
+    return RibFLoads(s_crush, s_shear, f_buckling_1, f_buckling_2)
+
 
 def get_section_coords(
     section: str, scale_fac: float, twist: float = 0, twist_xc: float = 0.5

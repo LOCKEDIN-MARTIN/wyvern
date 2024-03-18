@@ -50,6 +50,8 @@ def beam_derivatives(
     deflection = cumtrapz(slope, y, initial=0)
     deflection = deflection - deflection[idx_0]
 
+    print(max(deflection))
+
     # Stresses
     bending_stress = bending_moment * h / (2 * I)
     shear_stress = shear_force * Q / (I * b)

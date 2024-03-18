@@ -13,15 +13,19 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib import rcParams
 
 from wyvern.analysis.structures.abstractions import (
     RibControlPoints,
     SparControlPoints,
     Structure,
 )
-from wyvern.analysis.structures.plots import do_3d_plots, rib_loading_plot, spar_plots
-from wyvern.analysis.structures.rib_calcs import rib_loading
+from wyvern.analysis.structures.plots import (
+    do_3d_plots,
+    rib_failure_plot,
+    rib_loading_plot,
+    spar_plots,
+)
+from wyvern.analysis.structures.rib_calcs import rib_failure, rib_loading
 from wyvern.analysis.structures.spar_calcs import beam_derivatives
 from wyvern.utils.constants import G
 from wyvern.utils.geom_utils import mirror_verts
@@ -52,6 +56,8 @@ spar_2 = SparControlPoints(
 )
 
 rib_t_inches = np.array([1 / 4, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16])
+rib_min_t = 7e-3  # m; minimum rib thickness point
+rib_min_c = 100e-3  # m; minimum contiguous length
 
 # Rib Locations
 y = mirror_verts(np.array([0, 92.5, 185, 318, 451, 584, 717, 850])) * 1e-3  # m
@@ -78,6 +84,7 @@ rib_force = rib_loading(ell, y)
 
 # Plotting
 # do_3d_plots(structure)
+
 # rib_loading_plot(structure, rib_force, ell, n)
 # plt.savefig("rib_loads.pdf", bbox_inches="tight")
 
@@ -94,3 +101,8 @@ bd = [
 
 spar_plots(bd[0], bd[1], structure.spars[0], structure.spars[1], y_loading, b)
 plt.savefig("spar_loads.pdf", bbox_inches="tight")
+
+rib_f_loads = rib_failure(structure, rib_force, rib_min_t, rib_min_t, spar_width * 2)
+rib_failure_plot(rib_f_loads, rib_force, structure.rib.y)
+plt.savefig("rib_failure.pdf", bbox_inches="tight")
+# plt.show()
