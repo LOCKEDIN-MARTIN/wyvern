@@ -75,19 +75,45 @@ def sweep_payload_configs(
             params.aero_model,
             params.planform_area,
         )
+        cl_stall = cl_required(
+            7,
+            aircraft_weight,
+            params.planform_area,
+        )
+        cd_stall = params.aero_model.c_D(cl_stall)
+        ld_stall = cl_stall / cd_stall
+
+        cl_takeoff = cl_required(
+            8,
+            aircraft_weight,
+            params.planform_area,
+        )
+        cd_takeoff = params.aero_model.c_D(cl_takeoff)
+        ld_takeoff = cl_takeoff / cd_takeoff
 
         wing_loading = total_mass_ / 1000 / params.planform_area
 
         total_energy = (
-            energy_consumption(
-                total_mass_,
-                params.cruise_speed,
-                params.turn_speed,
-                params.aero_model,
-                params.planform_area,
+            sum(
+                energy_consumption(
+                    total_mass_,
+                    params.cruise_speed,
+                    params.turn_speed,
+                    params.aero_model,
+                    params.planform_area,
+                )
             )
             / params.propulsive_efficiency
         )
+        e_cruise, e_turn = energy_consumption(
+            total_mass_,
+            params.cruise_speed,
+            params.turn_speed,
+            params.aero_model,
+            params.planform_area,
+        )
+        e_cruise /= params.propulsive_efficiency
+        e_turn /= params.propulsive_efficiency
 
         (
             cargo_score,
@@ -117,7 +143,15 @@ def sweep_payload_configs(
             "cl_turn": cl_turn,
             "cd_turn": cd_turn,
             "ld_turn": ld_turn,
+            "cl_stall": cl_stall,
+            "cd_stall": cd_stall,
+            "ld_stall": ld_stall,
+            "cl_takeoff": cl_takeoff,
+            "cd_takeoff": cd_takeoff,
+            "ld_takeoff": ld_takeoff,
             "total_energy": total_energy,
+            "cruise_energy": e_cruise,
+            "turn_energy": e_turn,
             "cargo_pts_score": cargo_score,
             "pf_score": pf_score,
             "efficiency_score": efficiency_score,
@@ -141,6 +175,7 @@ def sensitivity_plot(
     sensitivity: str,
     sensitivity_range: Sequence[float],
     title: str = None,
+    labels: list[str] = None,
 ):
     """
     Plots the flight scores for various payload configurations under varying
@@ -176,17 +211,20 @@ def sensitivity_plot(
 
     # plot flight score wrt # golf balls for each param value
     fig, ax = plt.subplots()
-    for df, sens_value in zip(dfs, sensitivity_range):
+    if labels is None:
+        labels = sensitivity_range
+
+    for df, sens_value, label in zip(dfs, sensitivity_range, labels):
         ax.plot(
             df["num_golf_balls"],
             df["total_flight_score"],
-            label=f"{sens_value}",
+            label=f"{label}",
             marker="o",
         )
     ax.set_xlabel("Number of Golf Balls")
     ax.set_ylabel("Flight Score")
     ax.legend()
-    ax.grid()
+    ax.grid(linewidth=0.5, alpha=0.5)
     if title is None:
         plt.title(f"Flight Score vs. Payload Config\nfor Varying '{sensitivity}'")
     plt.title(title)

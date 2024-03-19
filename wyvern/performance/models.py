@@ -123,3 +123,49 @@ class CNSTLDModel(QuadraticLDModel):
 
     def __str__(self) -> str:
         return str(self.ld)
+
+
+@dataclass
+class VariableCD0Model:
+    """
+    Variable zero-lift drag coefficient model for aircraft performance analysis.
+
+    C_D0 = a * v ** b
+
+    Otherwise, operates identically to the quadratic lift-drag model.
+    """
+
+    c_d0_a: float
+    c_d0_b: float
+    e_inviscid: float
+    K: float
+    aspect_ratio: float
+    v_min = 1  # m/s
+
+    def c_d0(self, v: float):
+        v = np.clip(v, self.v_min, None)
+        return self.c_d0_a * v**self.c_d0_b
+
+    def e(self, v: float):
+        """
+        Oswald efficiency factor, taking into account viscous drag
+        contributions
+        """
+        return 1 / (
+            1 / (self.e_inviscid) + np.pi * self.K * self.aspect_ratio * self.c_d0(v)
+        )
+
+    def kappa(self, v: float):
+        return 1 / (np.pi * self.aspect_ratio * self.e(v))
+
+    def c_D(self, c_L: float, v: float):
+        """
+        Estimate the drag coefficient given a lift coefficient.
+        """
+        return self.c_d0(v) + self.kappa(v) * c_L**2
+
+    def c_L(self, c_D: float, v: float):
+        """
+        Estimate the lift coefficient given a drag coefficient.
+        """
+        return np.sqrt((c_D - self.c_d0(v)) / self.kappa(v))

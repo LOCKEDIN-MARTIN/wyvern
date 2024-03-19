@@ -26,7 +26,7 @@ print(f"Average s_wet/s_ref: {s_wet_s_ref.mean():.3f}")
 params = WingSizingParameters(
     takeoff_power=180,
     takeoff_thrust=9.25,
-    aspect_ratio=5.106,
+    aspect_ratio=5.106458,
     sweep_angle=30,
     airfoil_cl_max=1.2,
     s_wet_s_ref=2.1,

@@ -7,7 +7,9 @@ from wyvern.performance.models import CNSTLDModel, QuadraticLDModel
 from wyvern.sizing import aerostructural_mass_ratio, total_component_mass
 
 ld_model_cnst = CNSTLDModel(ld=9.8)
-ld_model_qd = QuadraticLDModel(c_d0=0.0320, e_inviscid=0.95, K=0.45, aspect_ratio=5.106)
+ld_model_qd = QuadraticLDModel(
+    c_d0=0.02959, e_inviscid=0.9131, K=0.45, aspect_ratio=5.106458
+)
 print(ld_model_qd.kappa)
 
 # calculate aerostructural mass ratio and fixed component masses first
@@ -20,8 +22,8 @@ params = PayloadSizingParameters(
     aero_model=ld_model_cnst,
     cruise_speed=10,
     turn_speed=10,
-    planform_area=0.566,
-    propulsive_efficiency=0.5,
+    planform_area=0.56595,
+    propulsive_efficiency=0.521,
     configuration_bonus=1.3,
     short_takeoff=True,
     stability_distance=0,

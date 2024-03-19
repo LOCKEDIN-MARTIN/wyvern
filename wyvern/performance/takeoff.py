@@ -4,7 +4,7 @@ import numpy as np
 from scipy.integrate import quad
 
 from wyvern.data.propellers import PropellerCurve
-from wyvern.performance.models import QuadraticLDModel
+from wyvern.performance.models import VariableCD0Model
 from wyvern.utils.constants import RHO, G
 
 
@@ -34,7 +34,7 @@ def prop_thrust(prop_model: PropellerCurve):
 def ground_roll_sweep(
     v_hw: float,
     v_max: float,
-    aero_model: QuadraticLDModel,
+    aero_model: VariableCD0Model,
     mass: float,
     mu: float,
     CLgr: float,
@@ -55,7 +55,7 @@ def ground_roll_sweep(
 def takeoff_distance(
     v_hw: float,
     v_lo: float,
-    aero_model: QuadraticLDModel,
+    aero_model: VariableCD0Model,
     mass: float,
     mu: float,
     CLgr: float,
@@ -87,7 +87,6 @@ def takeoff_distance(
         Takeoff speed series
     s_series: np.ndarray
         Takeoff distance series
-
     """
 
     # these correlations are currently speed-independent
@@ -102,7 +101,7 @@ def takeoff_distance(
         return normal_force(v) * mu
 
     def drag(v: float):
-        return 1 / 2 * RHO * v**2 * aero_model.c_D(CLgr)
+        return 1 / 2 * RHO * v**2 * aero_model.c_D(CLgr, v)
 
     def integrand(v: float):
         return mass * (v - v_hw) / (thrust_model(v) - drag(v) - friction(v))

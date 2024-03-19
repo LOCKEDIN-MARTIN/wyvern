@@ -7,20 +7,14 @@
     },
     "Propeller": {
         "category": "Propulsion",
-        "basic_mass": 10,
-        "mga_pct": 5,
+        "basic_mass": 17.8,
+        "mga_pct": 2.5,
         "qty": 1
     },
     "ESC": {
         "category": "Propulsion",
         "basic_mass": 37,
         "mga_pct": 2.5,
-        "qty": 1
-    },
-    "RPM Sensor": {
-        "category": "Propulsion",
-        "basic_mass": 10,
-        "mga_pct": 10,
         "qty": 1
     },
     "Battery": {
@@ -51,7 +45,7 @@
         "category": "Avionics",
         "basic_mass": 12,
         "mga_pct": 5,
-        "qty": 4
+        "qty": 2
     },
     "Air Data System": {
         "category": "Avionics",

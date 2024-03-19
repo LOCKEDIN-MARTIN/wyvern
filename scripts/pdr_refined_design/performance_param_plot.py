@@ -6,7 +6,9 @@ from wyvern.data.propellers import PROP_8X8, PROP_9X6, PROP_10X5
 from wyvern.performance.models import QuadraticLDModel
 from wyvern.performance.plotting import plot_drag_polar, power_plot, thrust_plot
 
-ld_model = QuadraticLDModel(c_d0=0.0320, e_inviscid=0.95, K=0.45, aspect_ratio=5.106)
+ld_model = QuadraticLDModel(
+    c_d0=0.02959, e_inviscid=0.9131, K=0.45, aspect_ratio=5.106458
+)
 ws = 2.874 * 9.81
 
 # plt.style.use("dark_background")
@@ -16,12 +18,12 @@ rcParams["text.usetex"] = True
 rcParams["font.family"] = "serif"
 
 plt.figure(figsize=(4, 3))
-power_plot(ld_model, ws, 0.566, PROP_9X6)
+power_plot(ld_model, ws, 0.56595, PROP_9X6)
 plt.title("Power Performance for 9x6E APC Propeller")
 plt.savefig("power_plot.pdf", bbox_inches="tight")
 
 plt.figure(figsize=(4, 3))
-thrust_plot(ld_model, ws, 0.566, PROP_9X6)
+thrust_plot(ld_model, ws, 0.56595, PROP_9X6)
 plt.title("Thrust Performance for 9x6E APC Propeller")
 plt.axvline(x=ld_model.v_ldmax(ws), color="C2", linestyle="--")
 plt.axvline(x=10, color="C3", linestyle="--")
@@ -62,7 +64,7 @@ plt.plot(cL_range, ld_15, label="$$C_L^{1.5}/C_D$$")
 plt.xlabel("$C_L$")
 plt.ylabel("Dimensionless")
 
-plt.grid()
+plt.grid(linewidth=0.5, alpha=0.5)
 plt.title("Performance parameters")
 plt.legend()
 plt.savefig("clcd15.pdf", bbox_inches="tight")

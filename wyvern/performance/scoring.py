@@ -58,12 +58,14 @@ def _flight_score_factors(
     mass = total_mass(payload_config, params.as_mass_ratio, params.total_fixed_mass)
 
     energy = (
-        energy_consumption(
-            mass,
-            params.cruise_speed,
-            params.turn_speed,
-            params.aero_model,
-            params.planform_area,
+        sum(
+            energy_consumption(
+                mass,
+                params.cruise_speed,
+                params.turn_speed,
+                params.aero_model,
+                params.planform_area,
+            )
         )
         / params.propulsive_efficiency
     )
