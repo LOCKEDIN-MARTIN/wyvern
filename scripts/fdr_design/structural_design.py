@@ -31,59 +31,55 @@ from wyvern.utils.constants import G
 from wyvern.utils.geom_utils import mirror_verts
 
 # aircraft parameters
-M0 = 1.63  # kg
+M0 = 2  # kg
 W0 = M0 * G  # N
-b = 1.7  # m; span
-n = 3.59  # load factor
+b = 1.4  # m; span
+n = 6  # load factor
 spar_width = 1 / 8 * 25.4e-3  # m; spar width
 
 # Structure definition
 rib = RibControlPoints(
-    y=np.array([0, 92.5, 185, 850]),
-    c=np.array([780, 600.0, 400, 120]),
-    xle=np.array([0, 120.0, 215, 598]),
-    twist=np.array([0, 0, 0, 5.0]),
+    y=np.array([0, 75, 700]),
+    c=np.array([400, 379, 200]),
+    xle=np.array([0, 0, 0]),
+    twist=np.array([0, 0, 0]),
     sections=None,  # auto
 )
 
 spar_1 = SparControlPoints(
-    y=np.array([0.0, 850.0]),
-    x=np.array([195.0, 628.0]),
+    y=np.array([0.0, 700]),
+    x=np.array([100, 100.0]),
 )
 spar_2 = SparControlPoints(
-    y=np.array([185.0, 850.0]),
-    x=np.array([515.0, 688.0]),
+    y=np.array([0.0, 700]),
+    x=np.array([150, 150.0]),
 )
 
-rib_t_inches = np.array([1 / 4, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16, 1 / 16])
+rib_t_inches = np.ones((6,)) * 1 / 8  # inches; rib thickness
 rib_min_t = 7e-3  # m; minimum rib thickness point
 rib_min_c = 100e-3  # m; minimum contiguous length
 
 # Rib Locations
-y = mirror_verts(np.array([0, 92.5, 185, 318, 451, 584, 717, 850])) * 1e-3  # m
+y = mirror_verts(np.array([75, 200, 325, 450, 575, 700]), skip_first=False) * 1e-3  # m
 structure = Structure.from_structure(y, rib, rib_t_inches, spar_1, spar_2)
 
 # Lift loading
 # - Each rib carries a portion of the lift
 # - The portion is equal to the integral of the lift distribution halfway between itself and its neighbours
 
-# data
-lift_path = Path(__file__).parent.parent.parent / "wyvern/data/sources/lift_dists"
-lift_data = np.genfromtxt(lift_path / "Full_cruise_L.csv", delimiter=",", skip_header=1)
-# normalize lift data
-T = np.trapz(lift_data[:, 1], lift_data[:, 0])
-lift_data[:, 1] = W0 * lift_data[:, 1] / T
 
+def ell(y):
+    # Elliptical lift distribution
+    return 4 * n * W0 / (np.pi * b) * np.sqrt(1 - (2 * y / b) ** 2)
 
-def ell(y: float):
-    # real lift distr
-    return np.interp(y, lift_data[:, 0], lift_data[:, 1]) * n
+    # Constant lift distribution
+    # return n * W0 / b
 
 
 rib_force = rib_loading(ell, y)
 
 # Plotting
-# do_3d_plots(structure)
+do_3d_plots(structure)
 
 # rib_loading_plot(structure, rib_force, ell, n)
 # plt.savefig("rib_loads.pdf", bbox_inches="tight")

@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from wyvern.analysis.structures.rib_calcs import spar_height
-from wyvern.data.airfoils import BOEING_VERTOL, NACA0018
+from wyvern.data.airfoils import NACA0012, NACA0014
 from wyvern.utils.geom_utils import mirror_verts
 
 
@@ -37,7 +37,7 @@ class RibControlPoints:
     twist: npt.NDArray[np.floating]
 
     def __post_init__(self):
-        self.sections = [BOEING_VERTOL if y < 0.185 else NACA0018 for y in self.y]
+        self.sections = [NACA0012 if y < 0.6 else NACA0014 for y in self.y]
         # mirror all control points and convert to meters
         self.y = mirror_verts(self.y) * 1e-3
         self.c = mirror_verts(self.c, negate=False) * 1e-3
@@ -118,10 +118,12 @@ class Structure:
         # make structure from y stations and rib control points
         rib_c = np.interp(y, rib.y, rib.c)
         rib_xle = np.interp(y, rib.y, rib.xle)
-        rib_sections = [NACA0018 if abs(y) < 0.185 else BOEING_VERTOL for y in y]
+        rib_sections = [NACA0012 if y < 0.6 else NACA0014 for y in y]
         twist = np.interp(y, rib.y, rib.twist)
 
-        rib_t = mirror_verts(rib_thicknesses, negate=False) * 1e-3 * 25.4
+        rib_t = (
+            mirror_verts(rib_thicknesses, negate=False, skip_first=False) * 1e-3 * 25.4
+        )
 
         spar_1_x = np.interp(y, spar_1.y, spar_1.x)
         spar_2_x = np.interp(y, spar_2.y, spar_2.x)

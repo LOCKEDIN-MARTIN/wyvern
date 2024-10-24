@@ -30,7 +30,6 @@ def rib_spar_structure_plot(
     for i, (spar_x, spar_tops, spar_bots) in enumerate(
         zip(spar_xs, spar_top, spar_bot)
     ):
-
         for j in range(num_ribs):
             airfoil = get_section_coords(sections[j], rib_c[j], twist[j])
 
@@ -204,7 +203,7 @@ def spar_plots(
     )
     axs012.set_ylabel("Bending Stress (MPa)", color="r")
     axs012.tick_params(axis="y", colors="r")
-    axs012.set_ylim(0, rupture_strength / 2e6 * 1.1)
+    axs012.set_ylim(0, max(bd1.bending_stress) / 1e6 * 1.1)
     axs012.set_yticks(
         sorted(axs012.get_yticks().tolist() + [rupture_strength / 1e6 / 2])
     )

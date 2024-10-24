@@ -1,7 +1,7 @@
 from typing import Callable, NamedTuple
 
 import numpy as np
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid
 
 
 class BeamDerivatives(NamedTuple):
@@ -30,11 +30,11 @@ def beam_derivatives(
     ell = lift_distr(y)
 
     # SFD
-    shear_force = cumtrapz(-ell * np.sign(y), y, initial=0)
+    shear_force = cumulative_trapezoid(-ell * np.sign(y), y, initial=0)
     shear_force = shear_force - shear_force[-1]
 
     # BMD
-    bending_moment = cumtrapz(-shear_force * np.sign(y), y, initial=0)
+    bending_moment = cumulative_trapezoid(-shear_force * np.sign(y), y, initial=0)
     bending_moment = bending_moment - bending_moment[-1]
 
     # find zero point
@@ -43,11 +43,11 @@ def beam_derivatives(
     # Slope
     I = (b * h**3) / 12
     Q = b * h**2 / 8
-    slope = cumtrapz(bending_moment / (E * I), y, initial=0)
+    slope = cumulative_trapezoid(bending_moment / (E * I), y, initial=0)
     slope = slope - slope[idx_0]
 
     # Deflection
-    deflection = cumtrapz(slope, y, initial=0)
+    deflection = cumulative_trapezoid(slope, y, initial=0)
     deflection = deflection - deflection[idx_0]
 
     print(max(deflection))
